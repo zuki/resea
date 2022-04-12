@@ -1,0 +1,147 @@
+# CONFIG_BUILD_DEBUG is not set
+CONFIG_BUILD_RELEASE=y
+CONFIG_MODULES=y
+
+#
+# Servers and Applications
+#
+
+#
+# <*>: autostarted / <M>: manually started from shell
+#
+CONFIG_BOOT_TASK="vm"
+
+#
+# vm
+#
+# end of vm
+
+#
+# Applications
+#
+# CONFIG_BENCHMARK_SERVER is not set
+# CONFIG_BENCHMARK_SERVER_SERVER is not set
+CONFIG_HELLO_SERVER=m
+
+#
+# Hello World
+#
+# CONFIG_PRINT_PERIODICALLY is not set
+# end of Hello World
+
+# CONFIG_HELLO_FROM_RUST_SERVER is not set
+CONFIG_MEMORY_LEAK_TEST_SERVER=m
+CONFIG_SHM_TEST_SERVER=m
+CONFIG_TEST_SERVER=m
+
+#
+# Kernel/Userland integrated tests
+#
+# CONFIG_WEBAPI_SERVER is not set
+# end of Applications
+
+CONFIG_DM_SERVER=y
+CONFIG_EXAMPLE_SERVER=m
+# CONFIG_HV_SERVER is not set
+# CONFIG_MINLIN_SERVER is not set
+CONFIG_RANDOM_SERVER=y
+CONFIG_SHELL_SERVER=y
+CONFIG_TCPIP_SERVER=y
+
+#
+# Block Drivers
+#
+CONFIG_IDE_SERVER=y
+CONFIG_RAMDISK_SERVER=y
+# end of Block Drivers
+
+#
+# GPU Drivers
+#
+# CONFIG_VIRTIO_GPU_SERVER is not set
+# end of GPU Drivers
+
+#
+# Input Drivers
+#
+# CONFIG_PS2_SERVER is not set
+# end of Input Drivers
+
+#
+# Network Drivers
+#
+CONFIG_E1000_SERVER=y
+# CONFIG_VIRTIO_NET_SERVER is not set
+# end of Network Drivers
+
+#
+# Real Time Clock Drivers
+#
+CONFIG_RTC_SERVER=y
+# end of Real Time Clock Drivers
+
+#
+# Experimental Apps/Servers/Drivers
+#
+CONFIG_DATETIME_SERVER=y
+# CONFIG_HDAUDIO_SERVER is not set
+# end of Experimental Apps/Servers/Drivers
+
+#
+# File Systems
+#
+CONFIG_FATFS_SERVER=y
+# CONFIG_TARFS_SERVER is not set
+# end of File Systems
+# end of Servers and Applications
+
+CONFIG_ARCH_ARM64=y
+# CONFIG_ARCH_X64 is not set
+# CONFIG_ARCH_EXAMPLE is not set
+CONFIG_ARCH="arm64"
+# CONFIG_BOOT_TASK_NOMMU_TEST is not set
+CONFIG_BOOT_TASK_VM=y
+CONFIG_MACHINE_RASPI3=y
+
+#
+# Common Setup (kernel and userland)
+#
+# CONFIG_OPT_LEVEL_0 is not set
+CONFIG_OPT_LEVEL_2=y
+# CONFIG_OPT_LEVEL_3 is not set
+# CONFIG_OPT_LEVEL_S is not set
+CONFIG_NUM_SYMBOLS=512
+# end of Common Setup (kernel and userland)
+
+#
+# Kernel
+#
+
+#
+# ARM64 Options
+#
+# CONFIG_TRACE_EXCEPTION is not set
+# end of ARM64 Options
+
+#
+# Raspberry Pi 3B+ Machine Support
+#
+CONFIG_MACHINE="raspi3"
+# CONFIG_FORCE_REBOOT_BY_WATCHDOG is not set
+# end of Raspberry Pi 3B+ Machine Support
+
+CONFIG_SEMIHOSTING=y
+# CONFIG_TRACE_IPC is not set
+CONFIG_IPC_FASTPATH=y
+CONFIG_NUM_TASKS=64
+CONFIG_TASK_NAME_LEN=16
+CONFIG_TASK_TIME_SLICE_MS=10
+CONFIG_KLOG_BUF_SIZE=1024
+# CONFIG_ABI_EMU is not set
+# end of Kernel
+
+#
+# Standard Library
+#
+CONFIG_OOL_BUFFER_LEN=16384
+# end of Standard Library
