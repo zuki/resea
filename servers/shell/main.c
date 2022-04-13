@@ -138,9 +138,9 @@ static void read_input(void) {
 
 void main(void) {
     TRACE("starting...");
-
+#ifdef CONFIG_ARCH_X64
     ASSERT_OK(irq_acquire(CONSOLE_IRQ));
-
+#endif
     // The mainloop: receive and handle messages.
     prompt("");
     while (true) {

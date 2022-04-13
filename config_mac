@@ -1,5 +1,5 @@
-# CONFIG_BUILD_DEBUG is not set
-CONFIG_BUILD_RELEASE=y
+CONFIG_BUILD_DEBUG=y
+# CONFIG_BUILD_RELEASE is not set
 CONFIG_MODULES=y
 
 #
@@ -31,17 +31,13 @@ CONFIG_HELLO_SERVER=m
 
 # CONFIG_HELLO_FROM_RUST_SERVER is not set
 CONFIG_MEMORY_LEAK_TEST_SERVER=m
-CONFIG_SHM_TEST_SERVER=m
-CONFIG_TEST_SERVER=m
-
-#
-# Kernel/Userland integrated tests
-#
+# CONFIG_SHM_TEST_SERVER is not set
+# CONFIG_TEST_SERVER is not set
 # CONFIG_WEBAPI_SERVER is not set
 # end of Applications
 
 CONFIG_DM_SERVER=y
-# CONFIG_EXAMPLE_SERVER is not set
+CONFIG_EXAMPLE_SERVER=m
 # CONFIG_HV_SERVER is not set
 # CONFIG_MINLIN_SERVER is not set
 CONFIG_RANDOM_SERVER=y
@@ -58,7 +54,13 @@ CONFIG_RAMDISK_SERVER=y
 #
 # GPU Drivers
 #
-# CONFIG_VIRTIO_GPU_SERVER is not set
+CONFIG_VIRTIO_GPU_SERVER=y
+
+#
+# virtio-gpu
+#
+# CONFIG_VIRTIO_GPU_DEMO is not set
+# end of virtio-gpu
 # end of GPU Drivers
 
 #
@@ -71,7 +73,7 @@ CONFIG_PS2_SERVER=y
 # Network Drivers
 #
 CONFIG_E1000_SERVER=y
-# CONFIG_VIRTIO_NET_SERVER is not set
+CONFIG_VIRTIO_NET_SERVER=y
 # end of Network Drivers
 
 #
@@ -91,16 +93,17 @@ CONFIG_DATETIME_SERVER=y
 # File Systems
 #
 CONFIG_FATFS_SERVER=y
-# CONFIG_TARFS_SERVER is not set
+CONFIG_TARFS_SERVER=y
 # end of File Systems
 # end of Servers and Applications
 
-# CONFIG_ARCH_ARM64 is not set
-CONFIG_ARCH_X64=y
+# CONFIG_ARCH_X64 is not set
 # CONFIG_ARCH_EXAMPLE is not set
-CONFIG_ARCH="x64"
+CONFIG_ARCH_ARM64=y
+CONFIG_ARCH="arm64"
 # CONFIG_BOOT_TASK_NOMMU_TEST is not set
 CONFIG_BOOT_TASK_VM=y
+CONFIG_MACHINE_RASPI3=y
 
 #
 # Common Setup (kernel and userland)
@@ -117,20 +120,26 @@ CONFIG_NUM_SYMBOLS=512
 #
 
 #
-# x64 Options
+# ARM64 Options
 #
-CONFIG_X64_PRINTK_IN_SCREEN=y
-# end of x64 Options
+CONFIG_TRACE_EXCEPTION=y
+# end of ARM64 Options
+
+#
+# Raspberry Pi 3B+ Machine Support
+#
+CONFIG_MACHINE="raspi3"
+# CONFIG_FORCE_REBOOT_BY_WATCHDOG is not set
+# end of Raspberry Pi 3B+ Machine Support
 
 CONFIG_SEMIHOSTING=y
-# CONFIG_TRACE_IPC is not set
+CONFIG_TRACE_IPC=y
 CONFIG_IPC_FASTPATH=y
 CONFIG_NUM_TASKS=64
 CONFIG_TASK_NAME_LEN=16
 CONFIG_TASK_TIME_SLICE_MS=10
 CONFIG_KLOG_BUF_SIZE=1024
 # CONFIG_ABI_EMU is not set
-# CONFIG_HYPERVISOR is not set
 # end of Kernel
 
 #

@@ -11,7 +11,19 @@ error_t fat_probe(struct fat *fs,
     struct bpb bpb;
     STATIC_ASSERT(sizeof(bpb) == SECTOR_SIZE);
     blk_read(0, &bpb, 1);
-
+/*
+    INFO("bpb: magic=0x%x%x%x", bpb.jmp[0], bpb.jmp[1], bpb.jmp[2]);
+    INFO("bpb: oem_name=%s, sector_size=%d, sectors_per_cluster=%d", bpb.oem_name, bpb.sector_size, bpb.sectors_per_cluster);
+    INFO("bpb: num_reserved_sectors=%d, num_fat=%d, num_root_entries=%d", bpb.num_reserved_sectors, bpb.num_fat, bpb.num_root_entries);
+    INFO("bpb: num_total_sectors16=%d, media_id=%d, sectors_per_fat16=%d", bpb.num_total_sectors16, bpb.media_id, bpb.sectors_per_fat16);
+    INFO("bpb: sectors_per_track=%d, num_head=%d, hidden_sectors=%d", bpb.sectors_per_track, bpb.num_head, bpb.hidden_sectors);
+    INFO("bpb: num_total_sectors32=%d, sectors_per_fat32=%d, flags=%d", bpb.num_total_sectors32, bpb.sectors_per_fat32, bpb.flags);
+    INFO("bpb: fat_version=%d, root_entries_cluster=%d, fsinfo_sector=%d", bpb.fat_version, bpb.root_entries_cluster, bpb.fsinfo_sector);
+    INFO("bpb: sectors_per_backup_boot=%d, fsinfo_sector=%d, sectors_per_backup_boot=%d", bpb.sectors_per_backup_boot, bpb.fsinfo_sector, bpb.sectors_per_backup_boot);
+    INFO("bpb: drive_number=%d, winnt_flags=%d, signature=%d", bpb.drive_number, bpb.winnt_flags, bpb.signature);
+    INFO("bpb: volume_id=%s, volume_label=%s, fat32_string=%s", bpb.volume_id, bpb.volume_label, bpb.fat32_string);
+    INFO("bpb: magic=0x%x%x", bpb.magic[0], bpb.magic[1]);
+*/
     if (bpb.sector_size != SECTOR_SIZE) {
         WARN("unexpected sector size: %d (expected to be %d)", bpb.sector_size,
              SECTOR_SIZE);
@@ -22,37 +34,40 @@ error_t fat_probe(struct fat *fs,
 
     // get the number of clusters
     size_t root_dir_sectors = (bpb.num_root_entries * 32) / bpb.sector_size;
-
+                                                    // 512 * 32 / 512 = 32
     size_t sectors_per_fat;
     if (bpb.sectors_per_fat16 == 0) {
         sectors_per_fat = bpb.sectors_per_fat32;
     } else {
-        sectors_per_fat = bpb.sectors_per_fat16;
+        sectors_per_fat = bpb.sectors_per_fat16;    // 12
     }
 
     size_t sectors;
     if (bpb.num_total_sectors16 == 0) {
         sectors = bpb.num_total_sectors32;
     } else {
-        sectors = bpb.num_total_sectors16;
+        sectors = bpb.num_total_sectors16;          // 8196
     }
-
+                                                    // 1 + (2 * 12) + 32 = 57
     size_t non_data_sectors = bpb.num_reserved_sectors
                               + (bpb.num_fat * sectors_per_fat)
                               + root_dir_sectors;
-    size_t total_data_clus =
+    size_t total_data_clus =                        // (8196 - 57) / 2 = 4069
         (sectors - non_data_sectors) / bpb.sectors_per_cluster;
 
     // Determine the type of the file system: FAT12, FAT16, or FAT32.
     enum fat_type type;
+    //INFO("sectors=%ld, non_data_sectors=%ld, bpb.sectors_per_cluster=%d, total_data_clus=%ld", sectors, non_data_sectors, bpb.sectors_per_cluster, total_data_clus);
     if (total_data_clus < 4085) {
         // FAT12 is not supported for now.
+        WARN("FAT12 not supported");
         return ERR_NOT_ACCEPTABLE;
     } else if (total_data_clus < 65525) {
         type = FAT16;
         fs->sectors_per_fat = bpb.sectors_per_fat16;
     } else {
         // FAT32 is not supported for now.
+        WARN("FAT32 not supported");
         return ERR_NOT_ACCEPTABLE;
     }
 
