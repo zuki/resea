@@ -94,3 +94,14 @@ $ make run
 [e1000] received 316 bytes
 [tcpip] dhcp: leased ip=10.0.2.15, netmask=255.255.255.0, gateway=10.0.2.2      // ここでストール
 ```
+
+# servers/shell/main.cを修正
+
+```c
+void main(void) {
+    TRACE("starting...");
+-#ifdef ARCH_X86
++#ifdef CONFIG_ARCH_X64
+    ASSERT_OK(irq_acquire(CONSOLE_IRQ));
+#endif
+```
