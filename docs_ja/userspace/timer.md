@@ -1,24 +1,32 @@
-# Timer
-Kernel provides a primitive timer feature. You can set the timer for the current task through `timer_set` API.
+# タイマー
+
+カーネルはプリミティブなタイマー機能を提供しています。`timer_set` APIを使って
+カレントタスクにタイマーをセットすることができます。
 
 
-## Header File
+## ヘッダーファイル
+
 ```c
 #include <resea/timer.h>
 ```
 
 ## API
+
 ```c
 error_t timer_set(msec_t timeout);
 ```
 
-Where `timeout` is the timeout value in milliseconds. After `timeout` milliseconds has passed, kernel notifies the task by a `NOTIFY_TIMER` notification.
+ここで、`timeout` はミリ秒単位のタイムアウト値です。`timeout`ミリ秒経過すると、
+カーネルはそのタスクに`NOTIFY_TIMER`を通知します。
 
-Note that this is an oneshot timer (like JavaScript's `setTimeout`): you need to call `timer_set` again if you need interval timer.
+これは（JavaScriptの`setTimeout`と同様に）ワンショットタイマーであることに
+注意してください。インターバルタイマーが必要な場合は再度`timer_set`を
+呼び出す必要があります。
 
-Also, currently **you can't set multiple timers**.
+また、現在のところ**複数のタイマーをセットすることはできません**。
 
-## Example
+## 例
+
 ```c
 #include <config.h>
 #include <resea/printf.h>
@@ -33,13 +41,13 @@ void main(void) {
     while (true) {
         struct message m;
 
-        // Wait until the kernel notifies us...
+        // カーネルの通知が来るかで待機
         ipc_recv(IPC_ANY, &m);
 
         if (m.type == NOTIFICATIONS_MSG) {
             if (m.notifications.data & NOTIFY_TIMER) {
-                // Received a timer notification. Print a message and reset the
-                // timer.
+                // タイマー通知を受信した。メッセージを出力して
+                // タイマーをリセットする。
                 TRACE("task's uptime: %d seconds", i++);
                 timer_set(1000 /* 1000ms = 1 second */);
             }

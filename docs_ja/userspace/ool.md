@@ -1,9 +1,9 @@
-# アウトオブラインペイロード
+# Out-of-Lineペイロード
 
 メッセージは固定長であり、そのサイズは非常に小さい（通常は256バイト）ので、
 大きなデータ（ファイルコンテンツなど）を送るための別の方法が必要です。
 
-*アウトオブラインペイロード* (短く*OoL*) はこの目的のために`vm`で実装
+*Out-of-Lineペイロード* (短く*OoL*) はこの目的のために`vm`で実装
 されている機能です。
 
 ## OoL種別
@@ -66,7 +66,8 @@ error_t err = ipc_call(fs_server, &m);
 
 ## OoLペイロードを受信する
 
-In the fs server, the IPC library sets a valid pointer to the OoL payload field. For `str` payloads, it is guaranteed that the string is terminalted by `\0`.
+fsサーバではIPCライブラリはOoLペイロードフィールドへの正しいポインタをセット
+します。`str`ペイロードでは文字列が`\0`終端されることが保証されています。
 
 ```c
 struct message m;
@@ -76,7 +77,8 @@ if (m.type == FS_OPEN_MSG) {
 }
 ```
 
-For `bytes` payload, use `<name>_len` to determine the size of the payload:
+`bytes`ペイロードではペイロードのサイズを決めるために`<name>_len`を使用して
+ください。
 
 ```c
 ipc_recv(fs_server, &m);
@@ -85,9 +87,11 @@ if (m.type == FS_READ_REPLY_MSG) {
 }
 ```
 
-A memory buffer for received OoL payload is dynamically allocated by `malloc`. **Don't forget to `free`!**
+OoLペイロードを受信するためのメモリバッファは`malloc`で動的に割り当てられます。
+**`free`することを忘れないでください。**
 
-## How It Works
+## どのように動作するのか
+
 ```
 +--------+  3. ool.send  +------+  2. ool.recv  +----------+
 | sender |  -----------> |  vm  | <------------ | receiver |
@@ -103,15 +107,24 @@ A memory buffer for received OoL payload is dynamically allocated by `malloc`. *
 +--------+               +------+               +----------+
 ```
 
-1. For messages with a ool payload, IPC stub generator adds `MSG_OOL` to the message type field (i.e. `(m.type & MSG_OOL) != 0` is true).
-2. In `ipc_recv` API, the receiver task sends a `ool.recv` message to tell the location of the OoL receive buffer (allocated by `malloc`) to the vm server.
-3. When a sender task `ipc_send` API, if `MSG_OOL` bit is set, it calls `ool.send` to the vm server before sending the message.
-4. The vm server looks for an unsed OoL buffer in the desitnation task, copies the OoL payload into the buffer, and returns the pointer to buffer in the receiver's address space.
-5. The sender tasks overwrites the OoL field with the receiver's pointer and sends the message.
-6. Once receiver task received a message with OoL, it calls vm's `ool.verify` to check if the received pointer and the length is valid.
-7. `ipc_recv` returns.
+1. oolペイロードを持つメッセージについては、IPCスタブがメッセージ種別フィールドに
+   `MSG_OOL`を追加します（したがって、`(m.type & MSG_OOL) != 0`がtrueになります）。
+2. `ipc_recv` APIでは受信側タスクは（`malloc`で割り当てた）OoL受信バッファの場所を
+   vmサーバに知らせるために`ool.recv`メッセージを送信します。
+3. 送信側タスクは`ipc_send` APIを送信する際、`MSG_OOL`ビットがセットされている場合は
+   メッセージを送信する前にvmサーバの`ool.send`を呼び出します。
+4. vmサーバは宛先タスクで未使用のOoLバッファを探してOoLペイロードをコピーし、受信者の
+   アドレス空間におけるバッファのポインタを返します。
+5. 送信側タスクはOoLフィールドを受信側のポインタで上書きし、メッセージを送信します。
+6. 受信側タスクはOoL月のメッセージを受信したらvmの`ool.verify`を呼び出して受信した
+   ポインタと長さが正しいかチェックします。
+7. `ipc_recv`がリターンします。
 
-### Why not Implement OoL in Kernel?
-In fact, OoL is initially implemented in the kernel and is removed later because it turned out that page fault handling makes the kernel complicated.
+### なぜOoLをカーネルで実装しないのか
 
-Since we can now map memory pages in the userspace through the `map` system call, I believe that it is a better idea to implement a more efficient message passing with OoL support within userspace using shared memory.
+実際、初期にはOoLはカーネルで実装されていましたが、後に、ページフォルト処理が
+カーネルを複雑にすることがわかったので削除されました。
+
+現在は`map`システムコールを通じてユーザ空間のメモリページをマップできるので、
+共有メモリを使ったユーザ空間におけるOoLをサポートした、より効率的なメッセージ
+パッシングの実装はより良いアイデアだと考えます。

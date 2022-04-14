@@ -1,9 +1,10 @@
-# Asynchronous IPC
-Despite the synchronous IPC works well in most cases, asynchronous message
-passing is sometimes convinient.
+# 非同期IPC
 
-The Resea Standard Library provides an asynchronous message pasing on top of the
-sychronous message passing and notifications. See examples below for more details.
+同期IPCはほとんど場合でうまくいきますが、非同期メッセージパッシングが
+便利な場面もあります。
+
+Resea標準ライブラリは同期メッセージパッシングと通知を使った非同期メッセージ
+パッシングを提供しています。詳細は以下の例を見てください。
 
 ```c
 #include <resea/async.h>
@@ -13,20 +14,22 @@ error_t async_recv(task_t src, struct message *m);
 error_t async_reply(task_t dst);
 ```
 
-In a nutshell, async library manages message queues. An async message is enqueued
-and the destination task is notified that there's a pending async message.
-The message will be delivered when the clients sends a pull request (`ASYNC_MSG`).
+一言で言うと、非同期ライブラリはメッセージキューを管理します。非同期メッセージは
+キューに入れられ、宛先タスクには保留の非同期メッセージがあることが通知されます。
+このメッセージはクライアントがpullリクエスト（`ASYNC_MSG`）を送信した際に配信
+されます。
 
-## Sending a Asynchronous Message
-Enqueue a message by `async_send` and handle message pull requests (`ASYNC_MSG`)
-by `async_reply`:
+## 非同期メッセージを送信する
+
+`asyn_send`によりメッセージをキューに入れ、`async_reply`によりpullリクエスト
+メッセージ（`ASYNC_MSG`）を処理します。
 
 ```c
 // my_server.c
 
 void somewhere(void) {
-    // `async_send` enqueues the message and notifies the destination task with
-    // the notification `NOTIFY_ASYNC`.
+    // `async_send`はメッセージをキューに入れ、通知 `NOTIFY_ASYNC`を
+    // 宛先タスクに通知します
     m.type = BENCHMARK_NOP_MSG;
     async_send(dst, &m);
 }
@@ -39,7 +42,7 @@ void main(void) {
 
         switch (m.type) {
             case ASYNC_MSG:
-                // Handle a request from the client's async_recv().
+                // クライアントのasync_recv()によるリクエストを処理する
                 async_reply(m.src);
                 break;
         }
@@ -47,9 +50,10 @@ void main(void) {
 }
 ```
 
-## Receiving a Asynchronous Message
-Wait for `NOTIFY_ASYNC` notification and the use `ipc_recv` to receive the pending
-async message:
+## 非同期メッセージを受信する
+
+Wait for `NOTIFY_ASYNC`通知を待ち、`ipc_recv`を使って保留中の非同期メッセージを
+受信します。
 
 ```c
 // my_client.c
@@ -63,10 +67,10 @@ void main(void) {
         switch (m.type) {
             case NOTIFICATIONS_MSG:
                 if (m.notifications.data & NOTIFY_ASYNC) {
-                    // Pull a pending asynchronous message from the server.
-                    // As you can see, you have to know which server would
-                    // send an async message in advance: you cannot determine
-                    // which task has notified NOTIFY_ASYNC!
+                    // 保留中の非同期メッセージをサーバから取り込む。
+                    // 見ての通り、事前にどのサーバが非同期メッセージを
+                    // 送るかを知る必要がある。どのタスクがNOTIFY_ASYNCを
+                    // 通知したのかは知ることができない。
                     async_recv(my_server, &m);
                     switch (m.type) {
                         case BENCHMARK_NOP_MSG:

@@ -1,34 +1,37 @@
-# Kernel Debugging
-Resea Kernel is written in C. While some people say *"C is a bad language! Rewrite
-everything in Rust!"*, C is a pretty good chioce for writing kernel because it
-makes easy to understand what happens.
+# カーネルデバッグ
 
-That said, debugging C code (especially in the kernel world) is really painful.
-In this page, we'll walk you through some useful features for kernel debugging.
+ReseaのカーネルはCで書かれています。「Cはひどい言語だ。Rustで全部書き直すべきだ」と
+言う人がいますが、何が起きているのかを理解しやすいのでカーネルを書くにはｃは非常に
+良い選択です。
+
+とはいえ、Cコードのデバッグは（特にカーネルの世界では）本当に骨が折れることです。
+このページでは、カーネルデバッグのための便利な機能を紹介します。
 
 ## printk
-Use the following macros:
+
+次のマクロを使ってください。
 
 - `TRACE(fmt, ...)`
-  - A trace message. Disabled on release build.
+  - traceメッセージ。リリースビルドでは無効になります。
 - `DEBUG(fmt, ...)`
-  - A debug message. Disabled on release build.
+  - debugメッセージ。リリースビルドでは無効になります。
 - `INFO(fmt, ...)`
-  - A info message.
+  - infoメッセージ。
 - `WARN(fmt, ...)`
-  - A warning message.
+  - warningメッセージ。
 - `OOPS(fmt, ...)`
-  - Same as `WARN` but it also prints a backtrace.
+  - Same as `WARN`と同じですが、バックトレースも出力します。
 - `OOPS(expr)`
-  - Prints an oops message if `expr != OK`.
+  - `expr != OK`の場合、oopsメッセージを出力します。
 - `PANIC(fmt, ...)`
-  - Kernel panic. It prints the message and halts the CPU.
+  - カーネルパニック。メッセージを出力してCPUを停止します。
 - `BUG(fmt, ...)`
-  - An unexpected situation occurred in the kernel (a bug). It prints the message and halts the CPU.
+  - カーネルで予測不能な状況が生じました（バグ）。メッセージを出力してCPUを停止します。
 
-## Backtrace
+## バックトレース
+
 - `backtrace()`
-  - Prints a backtrace like the following output. We recommend to use `OOPS` macro instead.
+  - 次のようなバックトレースを出力します。代わりに`OOPS`マクロの使用を勧めます。
 
 ```
 [kernel] WARN: Backtrace:
@@ -39,15 +42,19 @@ Use the following macros:
 [kernel] WARN:     #4: ffff8000001027d6 x64_start_kernel_thread(+0xa
 ```
 
-## Kernel Debugger
-Kernel debugger is available only in the debug build. You can use it over the serial port. Implemented commands are:
+## カーネルデバッガ
+
+カーネルデバッガはデバッグビルドでのみ使用できます。これはシリアルポート経由で
+利用できます。実装されているコマンドは次のとおりです。
 
 - `ps`
-  - List processes and threads. It's useful for debugging dead locks.
+  - プロセスとスレッドを一覧表示します。デッドロックのデバッグで役に立ちます。
 
-## Runtime Checkers
-In the debug build, the following runtime checkers are enabled.
-- Kernel Stack Canary
-  - Detects too much kernel stack consumption.
-- [Undefined Behavior Sanitizer (UBSan)](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html)
-  - Detects undefined behaviors like integer overflow.
+## ランタイムチェッカー
+
+デバッグビルドでは次のランタイムチェッカーが有効になります。
+
+- カーネルスタックカナリー
+  - カーネルスタックの過剰な消費を検知します。
+- [未定義動作サニタイザ (UBSan)](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html)
+  - 整数オーバーフローなどの未定義動作を検知します。

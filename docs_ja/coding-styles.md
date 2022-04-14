@@ -1,11 +1,15 @@
-# Coding Style Guides
-Please follow this style guide for consistency.
+# コーディングスタイルガイド
 
-## C Style Guides
-Use [clang-format](https://clang.llvm.org/docs/ClangFormat.html).
+一貫性を保つために次のスタイルガイドに従ってください。
 
-## Python Style Guides
-Please follow [PIP-8](https://www.python.org/dev/peps/pep-0008/).
+## Cのスタイルガイド
 
-## Rust Style Guides
-Use [rustfmt](https://github.com/rust-lang/rustfmt).
+[clang-format](https://clang.llvm.org/docs/ClangFormat.html)を使用してください。
+
+## Pythonのスタイルガイド
+
+[PIP-8](https://www.python.org/dev/peps/pep-0008/)に従ってください。
+
+## Rustのスタイルガイド
+
+[rustfmt](https://github.com/rust-lang/rustfmt)を使用してください。

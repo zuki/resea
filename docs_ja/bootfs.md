@@ -1,11 +1,14 @@
 # Boot FS
-Bootfs is a simple file system embedded in the kernel executable. It contains
-the first userland process image (typically bootstrap server) and some essential
-servers to boot the system. It's equivalent to *initramfs* in Linux.
 
-## On-Disk Format
 
-### File System Header
+Bootfsはカーネル実行ファイルに埋め込まれているシンプルなファイルシステムです。
+最初に起動されるユーザランドプロセスイメージ（通常はブートストラップサーバ）と
+システムを起動するために必須のいくつかのサーバを含んでいます。Linuxの
+*initramfs*に相当します。
+
+## オンディスクフォーマット
+
+### ファイルシステムヘッダー
 
 ```
 +---------------------------------------------+
@@ -29,7 +32,8 @@ servers to boot the system. It's equivalent to *initramfs* in Linux.
 +---------------------------------------------+
 ```
 
-### File
+### ファイル
+
 ```
 +---------------------------------------------+
 |                 File Path                   |

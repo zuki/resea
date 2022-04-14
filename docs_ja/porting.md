@@ -1,48 +1,51 @@
-# Porting to a CPU Architecture
+# 別のCPUアーキテクチャへのポーティング
 
-Porting to a new CPU architecture (*arch* in short) is pretty easy if you're
-already familiar with the architecture:
+新しいCPUアーキテクチャ（短く*arch*）へのポーティングはそのアーキテクチャについて
+熟知していればとても簡単です。
 
-1. Scaffold your new port using the *example* arch:
-  `libs/common/arch/example`, `kernel/arch/example`, and `libs/common/arch/example`.
-2. Define arch-specific types and build settings in the `common` library.
-3. Implement Hardware Abstraction Layer (HAL) for kernel.
-4. Implement arch-specific part in the `resea` library.
-5. Add the architecture in `Kconfig`.
+1. *example*アーキテクチャを使って新しいポートの骨組みを作成します。
+  `libs/common/arch/example`, `kernel/arch/example`, `libs/resea/arch/example`
+2. アーキテクチャ固有の型を定義し、`common`ライブラリの設定をします。
+3. カーネルのためのHAL(ハードウェア抽象レイヤ）を実装します。
+4. `resea`ライブラリのアーキテクチャ固有の部分を実装します。
+5. `Kconfig`にアーキテクチャを追加します。
 
-## Implementing `common` library
-The common library (`libs/common`) is responsible for providing standalone
-libraries (e.g. doubly-linked list) and types for both kernel and userspace programs.
-You'll need to implement the following files.
+## `common`ライブラリを実装する
+
+共通ライブラリ (`libs/common`) はスタンドアロンライブラリ（双方向リンクリストなど）
+とカーネルとユーザ空間プログラム相応のための型の提供を担当します。次のファイルを
+実装する必要があります。
 
 - `libs/common/arch/<arch-name>/arch.mk`
-  - Build options for the arch: `$CFLAGS`, `run` command, etc.
+  - アーキテクチャのためのオプションを構築します: `$CFLAGS`, `run` コマンドなど
 - `libs/common/arch/<arch-name>/arch_types.h`
-  - Arch-specific `#define`s and `typedef`s.
+  - アーキテクチャ固有の`#define`と`typedef`
 
-## Porting the kernel
-For portability, the kernel separates the arch-specific layer
-(*Hardware Abstraction Layer*) into `kernel/arch`.
+## カーネルを移植する
 
-Roughly speaking, you'll need to implement:
+ポータビリティのためにカーネルはアーキテクチャ固有のレイヤ
+（*ハードウェア抽象レイヤ*）を`kernel/arch`に分離しています。
 
-- CPU initialization
-- Serial port driver (for `print` functions)
-- Context switching
-- Virtual memory management (updating and switching page tables)
-  - Resea Kernel also supports `NOMMU` mode for CPUs that don't implement virtual memory.
-- Interrupt/exception/system call handlers
-- The linker script for the kernel executable (`kernel/arch/<arch-name>/kernel.ld`)
-- Multi-Processor support *(optional)*
+大雑把に言うと、以下の実装が必要です。
 
-## Implementing `resea` library
-The `resea` library is the standard library for userspace Resea applications.
-You'll need to implement:
+- CPUの初期化
+- シリアルポートドライバ（`print`関数のため）
+- コンテキストスイッチ
+- 仮想メモリ管理（ページテーブルの更新と切り替え）
+  - Reseaカーネルは仮想メモリを実装しないCPUのために`NOMMU`モードもサポートしています。
+- 割込み/例外/システムコールのハンドラ
+- カーネル実行ファイルのためのリンカスクリプト (`kernel/arch/<arch-name>/kernel.ld`)
+- マルチプロセッサのサポート *(オプション)*
 
-- The `syscall()` function.
-- The linker script for userspace programs (`libs/resea/arch/<arch-name>/user.ld`).
-- The entry point of the program: initialize stack pointer and then call `resea_init()`.
-- Bootfs support. Bootfs is a simple file system image (similar to tar file)
-  for Resea. Resea starts the first userspace programs from that file.
-  You need to embed the bootfs header to make room for the bootfs header.
-  See `libs/resea/arch/x64/start.S` for a concrete example.
+## `resea`ライブラリを実装する
+
+`resea`ライブラリはユーザ空間アプリケーションのための標準ライブラリです。
+以下の実装が必要です。
+
+- `syscall()`関数
+- ユーザ空間プログラムのためのリンカスクリプト (`libs/resea/arch/<arch-name>/user.ld`)
+- プログラムのエントリポイント: スタックポインタを初期化して、`resea_init()`を呼び出す。
+- Bootfsのサポート。BootfsはReseaのためのシンプルなファイルシステムイメージ（tarファイルと
+  同じ）です。Reseaはこのファイルから最初のユーザ空間プログラムを起動します。bootfs
+  ヘッダを埋め込むための空間を作成する必要があります。具体的な例は
+  `libs/resea/arch/x64/start.S`を参照してください。

@@ -1,9 +1,9 @@
 [book]
 authors = ["Seiya Nuta"]
-language = "en"
+language = "ja"
 multilingual = false
-src = "docs"
-title = "Resea Documentation"
+src = "docs_ja"
+title = "Reseaドキュメント"
 
 [output.html]
 default-theme = "rust"

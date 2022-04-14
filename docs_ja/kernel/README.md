@@ -1,2 +1,3 @@
-# Kernel Development
-In this section, we'll walk you through the Resea Kernel developement.
+# カーネルの開発
+
+この節ではReseaカーネルの開発について説明します。

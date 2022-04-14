@@ -1,20 +1,23 @@
-# Service Discovery
-The vm server implements service discovery, it allows looking for services by
-their names.
+# サービスの発見
 
-## Registering a Service
+vmサーバはサービスの発見を実装しています。これにより名前でサービスを
+探すことができます。
+
+## サービスを登録する
+
 ```c
 #include <resea/ipc.h>
 
 error_t ipc_serve(const char *name);
 ```
 
-## Looking for a Service
+## サービスを探す
+
 ```c
 #include <resea/ipc.h>
 
 task_t ipc_lookup(const char *name);
 ```
 
-This function blocks until the server with the given name has been registered,
-and then returns the server's task ID.
+この関数は指定した名前のサーバが登録されるまでブロックし、サーバのタスクIDを
+返します。

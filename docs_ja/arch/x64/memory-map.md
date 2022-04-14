@@ -1,8 +1,8 @@
-# Memory Map (x64)
+# メモリマップ (x64)
 
-## Physical Address Space
+## 物理アドレス空間
 
-| Address                      | Size     | Description                              |
+| アドレス                     | サイズ   | 説明                                     |
 |------------------------------|----------|------------------------------------------|
 | `0x0000_5000 - 0x0000_5fff`  | 4 KiB    | AP boot code                             |
 | `0x0000_6000 - 0x0000_5fff`  | 4 KiB    | GDTR for AP boot code                    |
@@ -11,9 +11,9 @@
 | `0x0010_1000 - 0x04ff_ffff`  | 78.9 MiB | Kernel image and data (including bootfs) |
 | `0x0500_0000 - (end of RAM)` |          | Managed by vm server                     |
 
-## Virtual Address Space
+## 仮想アドレス空間
 
-| Address                                         | Size         | Description                                                           |
+| アドレス                                        | サイズ       | 説明                                                                  |
 |-------------------------------------------------|--------------|-----------------------------------------------------------------------|
 | `0x0100_0000 - 0x02ff_efff`                     | 31.9 MiB     | .text, .rodata                                                        |
 | `0x02ff_f000 - 0x02ff_ffff`                     | 4 KiB        | cmdline (so-called command line arguments)                            |

@@ -1,21 +1,25 @@
-# Unit Testing
-`libs/unittest` provides a very primitive unit testing framework for libraries
-(in `libs`) and userspace applications (in `servers`). It's useful if you're
-writing a somewhat complicated function.
+# ユニットテスト
 
-This framework enables some attractive characteristics and features:
+`libs/unittest`は（`libs`にある）ライブラリと（`servers`にある）ユーザ空間
+アプリケーションのための非常にプリミティブなユニットテストフレームワークを
+提供しています。少し複雑な関数を書く場合に役に立ちます。
 
-- The framework compiles tests into a normal userspace application for the your
-  development environment (e.g. macOS).
-- Since the testing program is a native application, it is super-fast and
-  you can use your favorite debugging tools like LLDB!
-- [Undefined Behavior Sanitizer](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) and [Address Santizer](https://clang.llvm.org/docs/AddressSanitizer.html) are enabled by default.
+このフレームワークは魅力的な特徴と機能を持っています。
 
-## Caveats
-- You can't use system calls (e.g. message passing) from the testing environment.
-- `main()` in your Resea application won't be called.
+- フレームワークはテストを開発環境（macOSなど）用の通常のユーザ空間
+  アプリケーションにコンパイルします。
+- テストプログラムはネイティブアプリケーションなので超早く、LLDBなどの
+  好みのデバッグツールを使用することができます。
+- [Undefined Behavior Sanitizer](https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) と [Address Santizer](https://clang.llvm.org/docs/AddressSanitizer.html)が
+  デフォルトで有効になっています。
 
-## Writing Tests
+## 補足説明
+
+- テスト環境からは（メッセージパッシングなどの）システムコールを使うことはできません
+- Reseaアプリケーションの`main()`は呼び出されません。
+
+## テストを書く
+
 ```c
 #include <unittest.h>
 
@@ -28,16 +32,18 @@ TEST("1 + 1 equals to 2") {
 }
 ```
 
-### Macros
-- `TEST("description")`: Use this macro to define a unit testing function.
-- `TEST_EXPECT_EQ(a, b)`: Checks if `a == b` holds.
-- `TEST_EXPECT_NE(a, b)`: Checks if `a != b` holds.
-- `TEST_EXPECT_LT(a, b)`: Checks if `a < b` holds.
-- `TEST_EXPECT_LE(a, b)`: Checks if `a <= b` holds.
-- `TEST_EXPECT_GT(a, b)`: Checks if `a > b` holds.
-- `TEST_EXPECT_GE(a, b)`: Checks if `a >= b` holds.
+### マクロ
 
-## How to Run Tests
+- `TEST("description")`: ユニットテスト関数の定義にはこのマクロを使用します。
+- `TEST_EXPECT_EQ(a, b)`: `a == b` であるかチェックする。
+- `TEST_EXPECT_NE(a, b)`: `a != b` であるかチェックする。
+- `TEST_EXPECT_LT(a, b)`: `a < b` であるかチェックする。
+- `TEST_EXPECT_LE(a, b)`: `a <= b` であるかチェックする。
+- `TEST_EXPECT_GT(a, b)`: `a > b` であるかチェックする。
+- `TEST_EXPECT_GE(a, b)`: `a >= b` であるかチェックする。
+
+## テストを実行する
+
 ```
 $ make unittest TARGET=servers/apps/test
 ```

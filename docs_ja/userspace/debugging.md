@@ -1,13 +1,15 @@
-# Debugging
-We don't have rich debugging features yet. Use printf macros. Good luck!
+# デバッグ
 
-## How to deal with dead locks in IPC
-Even if you don't use locks like *mutex* (note that we don't provide such
-a thing), your program could be blocked forever by an IPC operation.
+今のところリッチなデバッグ機能はありません。printfマクロを使用
+してください。幸運を祈ります。
 
-The common case is that both your program and the destination task are trying
-to send a message to each other. You can check it by `ps` command
-in the kernel debugger:
+## IPCにおけるデッドロックの扱い方
+
+*mutex*のようなロックを使わなくても（そのようなものは提供していないことに注意）、
+IPC操作によりプログラムが永遠にブロックされることがあります。
+
+よくあるケースはプログラムと宛先タスクの双方が互いにメッセージを送信しようと
+している場合です。これはカーネルデバッガの`ps`コマンドで確認することができます。
 
 ```
 kdebug> ps
@@ -24,5 +26,5 @@ kdebug> ps
 #7 webapi: state=blocked, src=0
 ```
 
-Notice that `e1000` and `tcpip` are blocked and they're sending to
-the other server.
+`e1000`と`tcpip`がブロックされており、両者が互いに送信していることに
+注目してください。

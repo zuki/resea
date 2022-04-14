@@ -1,1 +1,1 @@
-# Arch-specific Documentation
+# アーキテクチャ固有のドキュメント

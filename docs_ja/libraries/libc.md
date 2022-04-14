@@ -1,10 +1,15 @@
-# libc (POSIX compatibility layer)
-`libc` is a port of [newlib](https://sourceware.org/newlib/), which provides POSIX APIs used for porting third party libraries like [Cairo](https://www.cairographics.org/).
+# libc (POSIX互換レイヤ)
 
-## How to port a new third-party library
-TODO: Ask me to write if you need :)
+`libc`は[newlib](https://sourceware.org/newlib/)のポートであり、
+[Cairo](https://www.cairographics.org/)などのサートパーティライブリで
+使用するPOSIX APIを提供します。
 
-## References
+## 新規サードパーティライブラリのポーティングの方法
 
-## Source Location
+TODO: 必要であれば私に書くように言ってください :)
+
+## 参考資料
+
+## ソース
+
 [libs/third_party/libc](https://github.com/nuta/resea/tree/master/libs/third_party/libc)

@@ -1,1 +1,1 @@
-# Common Library (libs/common)
+# 共通ライブラリ (libs/common)
