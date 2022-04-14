@@ -2,6 +2,7 @@
 #include <resea/ipc.h>
 #include <resea/malloc.h>
 #include <resea/printf.h>
+#include <arch/syscall.h>
 #include <resea/syscall.h>
 #include <string.h>
 
