@@ -23,7 +23,7 @@ const char *__program_name(void);
 #define SGR_ERR      "\e[1;91m"  // Bold red.
 #define SGR_WARN     "\e[0;33m"  // Yellow.
 #define SGR_WARN_DBG "\e[1;33m"  // Bold yellow.
-#define SGR_INFO     "\e[0;96m"  // Cyan.
+#define SGR_INFO     "\e[1;36m"  // Bold cyan.
 #define SGR_DEBUG    "\e[1;32m"  // Bold green.
 #define SGR_RESET    "\e[0m"
 
