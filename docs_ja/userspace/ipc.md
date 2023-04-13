@@ -74,7 +74,7 @@ error_t ipc_send_noblock(task_t dst, struct message *m);
 error_t ipc_recv(task_t src, struct message *m);
 ```
 
-## サーバからのメッセージに登録する
+## サーバからのメッセージに応答する
 
 送り手のタスクが応答メッセージを待たない場合は、次のラッパー関数（`ipc_send_noblock`
 をラップ）を使用してください。クライアントが`ipc_call`でサーバを呼び出した場合、
@@ -87,7 +87,7 @@ void ipc_reply_err(task_t dst, error_t error);
 
 ## 通知を送信する
 
-*通知*はLinuxにおける*シグナル*のように非同期なIPCです。各タスクは各自、通知ビット
+*通知*はLinuxの*シグナル*のような非同期なIPCです。タスクは各自、通知ビット
 フィールドを持っています。タスクがメッセージを受信しようとした際に保留通知がある
 （ビットフィールドがゼロでない）と、カーネルは通知メッセージ`NOTIFICATIONS_MSG`を
 作成して返します。
@@ -96,7 +96,7 @@ void ipc_reply_err(task_t dst, error_t error);
 error_t ipc_notify(task_t dst, notifications_t notifications);
 ```
 
-`ipc_notify`は送り先タスクの通知ビットフィールドと指定したビットのビット単位OR操作、
+`ipc_notify`は送り先タスクの通知ビットフィールドと指定したビットのビット論理和操作、
 `dst->notifications |= notifications`を行います。
 
 ## メッセージの送受信を一度に行う
@@ -107,8 +107,8 @@ error_t ipc_replyrecv(task_t dst, struct message *m);
 ```
 
 `ipc_call`は、`ipc_send(dst, m)`を行ってから`ipc_recv(dst, m)`を行うことと
-同じです。クライアントはこれら2つのAPIを呼び出す代わりにこのAPIを使用する
-べきです。そうでないとサーバからの`ipc_reply`が失敗する可能性があります。
+同じです。クライアントは2つのAPIは使わずに`ipc_call`を使用するべきです。
+そうでないとサーバからの`ipc_reply`が失敗する可能性があるからです。
 
 両APIとも受信したメッセージでメッセージバッファ`m`を上書きします。
 

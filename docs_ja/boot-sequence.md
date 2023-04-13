@@ -8,12 +8,14 @@
 5. この最初のユーザランドプロセス（通常は`vm`）がbootfsから各種サーバを
    生成します。
 
+# arm64の場合
+
 ## 1. カーネルイメージのロード
 
 1. kernel8.imgが0x80000にコピーされ0x80000から実行開始
 2. kernel8.imgはresea.elfをbinary形式に変換したもの
 3. resea.elfの先頭は`kernel/arch/arm64/machines/raspi3/boot.S`
-4. したがって、boot.Sの実行
+4. したがって、boot.Sがまず実行される
 
 ### resea.elfの冒頭
 
@@ -63,7 +65,7 @@ Disassembly of section .boot:
 
 1. boot: el2の設定をしてel1 (2)へ
 2. el1_mode: 各cpu用のspをセットして、bsp(cpu0)なら(3), ap(cpu1-3)は(4)へ
-3. bsp_boot: paging tableの構築して(4)へ
+3. bsp_boot: paging tableを構築して(4)へ
 4. enable_mmu: mmuを有効にして(5)へ
 5. mmu_enabled: spをupperアドレスへ移動してarm64_init()を呼び出す
 
@@ -77,15 +79,15 @@ Disassembly of section .boot:
 
 1. 例外ベクタの登録
 2. apは以下を実行、bspは(3)へ
-   1. lock(): 何もせずreturn (FIXME)    (kernel/arch/arm64/mp.c)
-   2. mpinit(): irqをマスクしてmpmain()を呼び出し (NORETRUN)
+   1. lock(): lock_ownewを自分にしてロック    (kernel/arch/arm64/mp.c)
+   2. mpinit(): irqをマスクしてwfe, 起こされたらmpmain()を呼び出す (NORETRUN)
 3. cpuvar[], bssの0クリア
 4. arm64_peripherals_init(): uart, watchdog, timerの初期化
 5. lock(): big lock
 6. データキャッシュ、命令キャッシュの有効化
 7. ベンチマーク用の設定
 8. マシン固有のbootinfoの設定 (FIXEME)
-9. kmain(&bootinfo)を呼び出し (NORETURN)
+9. kmain(&bootinfo)を呼び出す (NORETURN)
 
 ## 3. カーネルの初期化処理
 
@@ -104,10 +106,12 @@ Disassembly of section .boot:
    1. task_lookup_unchecked(1) => &tasks[0] (tid=1)
    2. task_create(): vm server task
 5. map_bootelf(): boot elfを仮想メモリにマップ
-6. mpmain()の呼び出し
+6. mpmain()を呼び出す
 
 ## 3.2 mpmain(): kernel/boot.c
 
-1. task_create(): IDLE_TASK (tid=0) の作成
+1. task_create(): IDLE_TASK (tid=0) を作成
 2. CURRENT = IDLE_TASK
-3. arch_idele(): 無限ループ
+3. arch_idle(): `wfi`で割り込みがかかるのを待つ
+   1. task_switch();
+   2. 無限ループ: unlock(); irqを有効にしてwfi; 起こされたらirqを無効にしてlock();

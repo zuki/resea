@@ -7,4 +7,4 @@ Currently it only supports rendering a framebuffer.
 - [Virtual I/O Device (VIRTIO) Version 1.1](http://docs.oasis-open.org/virtio/virtio/v1.1/virtio-v1.1.html)
 
 ## Source Location
-[servers/drivers/gpu/virtio_gpu](https://github.com/nuta/resea/tree/master/servers/drivers/gpu/virtio_gpu)
+[servers/drivers/gpu/virtio_gpu](https://github.com/zuki/resea/tree/master/servers/drivers/gpu/virtio_gpu)

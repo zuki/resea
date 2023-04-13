@@ -11,4 +11,4 @@ $ make run VIRTIO_NET=1 VIRTIO_MODERN=1
 - [Virtual I/O Device (VIRTIO) Version 1.1](http://docs.oasis-open.org/virtio/virtio/v1.1/virtio-v1.1.html)
 
 ## Source Location
-[servers/drivers/net/virtio_net](https://github.com/nuta/resea/tree/master/servers/drivers/net/virtio_net)
+[servers/drivers/net/virtio_net](https://github.com/zuki/resea/tree/master/servers/drivers/net/virtio_net)

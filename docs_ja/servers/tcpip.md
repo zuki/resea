@@ -14,4 +14,4 @@ TCP/IPサーバ (`tcpip`) は一般的なインターネットプロトコルを
 
 ## ソースコード
 
-[servers/tcpip](https://github.com/nuta/resea/tree/master/servers/tcpip)
+[servers/tcpip](https://github.com/zuki/resea/tree/master/servers/tcpip)

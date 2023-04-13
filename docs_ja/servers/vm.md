@@ -9,11 +9,11 @@
 
 - 物理メモリページの割り当てとマッピング。言い換えれば、カーネルはメモリページの
   割り当てを*しません*。その任務をvmに委託します。
-- タスクの起動とページャタスクとしてその例外（ぺーじフォルトなど）の処理
+- タスクの起動とページャタスクとしてその例外（ページフォルトなど）の処理
 - サービスの発見（`ipc_lookup` API）
 - [Out-of-Lineペイロード](../userspace/ool) の送信
 
 
 ## ソースコード
 
-[servers/vm](https://github.com/nuta/resea/tree/master/servers/vm)
+[servers/vm](https://github.com/zuki/resea/tree/master/servers/vm)

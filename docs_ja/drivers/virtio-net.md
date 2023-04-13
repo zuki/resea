@@ -16,4 +16,4 @@ $ make run VIRTIO_NET=1 VIRTIO_MODERN=1
 
 ## ソースコード
 
-[servers/drivers/net/virtio_net](https://github.com/nuta/resea/tree/master/servers/drivers/net/virtio_net)
+[servers/drivers/net/virtio_net](https://github.com/zuki/resea/tree/master/servers/drivers/net/virtio_net)

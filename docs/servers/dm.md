@@ -3,4 +3,4 @@ The device manager, called `dm`, is responsible for managing devices on the comp
 
 
 ## Source Location
-[servers/dm](https://github.com/nuta/resea/tree/master/servers/dm)
+[servers/dm](https://github.com/zuki/resea/tree/master/servers/dm)

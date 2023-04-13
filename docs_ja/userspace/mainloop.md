@@ -33,17 +33,16 @@ void main(void) {
 
 この短いスニペットからReseaでのサーバ（アプリケーション）の書き方を学ぶことができます。
 
-- ユーザ空間プログラムにおいては*Resea 標準ライブラリ* (`libs/resea`)を使用する
-  Cではこれらは`<resea/*.h>`ヘッダファイルを指定することで使用できる。
+- ユーザ空間プログラムにおいては*Resea 標準ライブラリ* (`libs/resea`)を使用します。
+  Cでは`<resea/*.h>`ヘッダファイルを指定することでこのライブラリを使用できます。
   - `<resea/ipc.h>`: `ipc_recv`などのメッセージパッシングAPI
   - `<resea/printf.h>`: `INFO`, `TRACE`, `ASSERT_OK`などのプリント/アサーションマクロ。
-- メッセージパッシングAPI(`ipc_recv`と`ipc_reply`)はブロッキングであり、メッセージは
-  固定長（アーキテクチャにより、32-256バイト）である。
+- メッセージパッシングAPI(`ipc_recv`と`ipc_reply`)は同期的（ブロックする）であり、
+  メッセージは固定長（アーキテクチャにより、32-256バイト）です。
 - クライアントへのメッセージの応答にメッセージバッファ`m`を再利用する場合は、
-  情報漏れを防ぐために`bzero`でバッファをクリアする。
+  情報漏れを防ぐために`bzero`でバッファをクリアします。
 - シングルスレッドのイベントドリブンのプログラム、すなわち、メッセージを受け取り、
   処理し、応答する。そして、新しいメッセージを待つ、というプログラムを書くことを
-  推奨する。
+  推奨します。
   - これによりマルチサーバオペレーティングシステムのような複雑なソフトウェアのデバッグ
-    のコストが大幅に削減される。[John Ousterhout. Why Threads Are A Bad Idea (for most purposes)](https://web.stanford.edu/~ouster/cgi-bin/papers/threads.pdf)を参照され
-    たい。
+    のコストが大幅に削減されます。[John Ousterhout. Why Threads Are A Bad Idea (for most purposes)](https://web.stanford.edu/~ouster/cgi-bin/papers/threads.pdf)を参照してください。

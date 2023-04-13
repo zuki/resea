@@ -7,4 +7,4 @@
 
 ## ソースコード
 
-[servers/fs/tarfs](https://github.com/nuta/resea/tree/master/servers/fs/tarfs)
+[servers/fs/tarfs](https://github.com/zuki/resea/tree/master/servers/fs/tarfs)

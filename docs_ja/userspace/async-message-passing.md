@@ -1,6 +1,6 @@
 # 非同期IPC
 
-同期IPCはほとんど場合でうまくいきますが、非同期メッセージパッシングが
+同期IPCでほとんどの場合はうまくいきますが、非同期のメッセージパッシングが
 便利な場面もあります。
 
 Resea標準ライブラリは同期メッセージパッシングと通知を使った非同期メッセージ
@@ -42,7 +42,7 @@ void main(void) {
 
         switch (m.type) {
             case ASYNC_MSG:
-                // クライアントのasync_recv()によるリクエストを処理する
+                // クライアントのasync_recv()でリクエストを処理する
                 async_reply(m.src);
                 break;
         }
@@ -52,7 +52,7 @@ void main(void) {
 
 ## 非同期メッセージを受信する
 
-Wait for `NOTIFY_ASYNC`通知を待ち、`ipc_recv`を使って保留中の非同期メッセージを
+`NOTIFY_ASYNC`通知を待ち、`ipc_recv`を使って保留中の非同期メッセージを
 受信します。
 
 ```c
@@ -69,8 +69,8 @@ void main(void) {
                 if (m.notifications.data & NOTIFY_ASYNC) {
                     // 保留中の非同期メッセージをサーバから取り込む。
                     // 見ての通り、事前にどのサーバが非同期メッセージを
-                    // 送るかを知る必要がある。どのタスクがNOTIFY_ASYNCを
-                    // 通知したのかは知ることができない。
+                    // 送るのかは知っている必要があるが、どのタスクが
+                    // NOTIFY_ASYNCを通知したのかは知ることができない。
                     async_recv(my_server, &m);
                     switch (m.type) {
                         case BENCHMARK_NOP_MSG:

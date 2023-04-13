@@ -19,7 +19,7 @@ error_t timer_set(msec_t timeout);
 ここで、`timeout` はミリ秒単位のタイムアウト値です。`timeout`ミリ秒経過すると、
 カーネルはそのタスクに`NOTIFY_TIMER`を通知します。
 
-これは（JavaScriptの`setTimeout`と同様に）ワンショットタイマーであることに
+これは（JavaScriptの`setTimeout`と同じく）ワンショットタイマーであることに
 注意してください。インターバルタイマーが必要な場合は再度`timer_set`を
 呼び出す必要があります。
 
@@ -41,7 +41,7 @@ void main(void) {
     while (true) {
         struct message m;
 
-        // カーネルの通知が来るかで待機
+        // カーネルから通知が来るまで待機
         ipc_recv(IPC_ANY, &m);
 
         if (m.type == NOTIFICATIONS_MSG) {

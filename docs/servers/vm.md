@@ -11,4 +11,4 @@ Once the kernel initializes itself, it loads and starts `vm` as the first task.
 
 
 ## Source Location
-[servers/vm](https://github.com/nuta/resea/tree/master/servers/vm)
+[servers/vm](https://github.com/zuki/resea/tree/master/servers/vm)

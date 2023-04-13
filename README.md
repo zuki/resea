@@ -1,6 +1,6 @@
 Resea
 =====
-[![Integrated Tests](https://github.com/nuta/resea/workflows/Integrated%20Tests/badge.svg)](https://github.com/nuta/resea/actions/workflows/integrated_tests.yml)
+[![Integrated Tests](https://github.com/zuki/resea/workflows/Integrated%20Tests/badge.svg)](https://github.com/zuki/resea/actions/workflows/integrated_tests.yml)
 [![Gitter chat](https://badges.gitter.im/resea/community.svg)](https://gitter.im/resea/community)
 
 ![screenshot](https://gist.githubusercontent.com/nuta/42b36c50df15142ac25c3a5420607f2a/raw/e6c05de775f4649f6ba29638fd3ed8f40ea2f74f/screenshot.png)
@@ -20,7 +20,7 @@ Features
 - Provides **easy-to-use APIs** and every components are written in **single-threaded event-driven** approarch. It makes really easy to understand how Resea works and debug your code.
 - Some attractive experimental features like **Linux ABI emulation**, **Rust support**, and **Hardware-assisted Hypervisor (like Linux's KVM)**.
 
-See **[Road Map](https://github.com/nuta/resea/projects/1)** for planned new features and improvements.
+See **[Road Map](https://github.com/zuki/resea/projects/1)** for planned new features and improvements.
 
 ## Quickstart
 ### macOS
@@ -46,7 +46,7 @@ If you have any questions, feel free to talk to us on [Gitter](https://gitter.im
 Contributing
 ------------
 We accept bug reports, feature requests, and patches on
-[GitHub](https://github.com/nuta/resea).
+[GitHub](https://github.com/zuki/resea).
 
 License
 -------

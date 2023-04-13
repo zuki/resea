@@ -12,4 +12,4 @@ TODO: 必要であれば私に書くように言ってください :)
 
 ## ソース
 
-[libs/third_party/libc](https://github.com/nuta/resea/tree/master/libs/third_party/libc)
+[libs/third_party/libc](https://github.com/zuki/resea/tree/master/libs/third_party/libc)

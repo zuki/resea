@@ -12,4 +12,4 @@
 
 ## ソースコード
 
-[servers/fs/fatfs](https://github.com/nuta/resea/tree/master/servers/fs/fatfs)
+[servers/fs/fatfs](https://github.com/zuki/resea/tree/master/servers/fs/fatfs)

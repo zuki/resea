@@ -2,16 +2,20 @@
 
 ## 物理アドレス空間
 
+- `kernel/arch/x64/kernel.ld`
+- `kernel/arch/x64/boot.S`
+
 | アドレス                     | サイズ   | 説明                                     |
 |------------------------------|----------|------------------------------------------|
 | `0x0000_5000 - 0x0000_5fff`  | 4 KiB    | AP boot code                             |
-| `0x0000_6000 - 0x0000_5fff`  | 4 KiB    | GDTR for AP boot code                    |
-| `0x0010_0000 - 0x0010_1000`  | 4 KiB    | BSP boot code                            |
-| `0x0010_1000 - 0x0010_0000`  | 4 KiB    | BSP boot code                            |
-| `0x0010_1000 - 0x04ff_ffff`  | 78.9 MiB | Kernel image and data (including bootfs) |
+| `0x0000_6000 - 0x0000_6fff`  | 4 KiB    | GDTR for AP boot code                    |
+| `0x0010_0000 - 0x0010_0fff`  | 4 KiB    | BSP boot code                            |
+| `0x0010_1000 - 0x03ff_ffff`  | 63 MiB   | Kernel image and data (including bootfs) |
 | `0x0500_0000 - (end of RAM)` |          | Managed by vm server                     |
 
 ## 仮想アドレス空間
+
+- `libs/resea/arch/x64/user.ld`
 
 | アドレス                                        | サイズ       | 説明                                                                  |
 |-------------------------------------------------|--------------|-----------------------------------------------------------------------|

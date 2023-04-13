@@ -1,7 +1,7 @@
-# ramdisk
-A pseudo device driver which provides in-memory virtual disk.
+# RAMディスク
+インメモリ仮想ディスクを提供する疑似デバイスドライバです。
 
-Usually it is used for debugging the file system drivers.
+通常はファイルシステムドライバのテストに使用します。
 
-## Source Location
-[servers/drivers/blk/ramdisk](https://github.com/nuta/resea/tree/master/servers/drivers/blk/ramdisk)
+## ソースコード
+[servers/drivers/blk/ramdisk](https://github.com/zuki/resea/tree/master/servers/drivers/blk/ramdisk)

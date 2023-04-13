@@ -1,25 +1,28 @@
-# hdaudio (experimental)
-A device driver for the Intel HD Audio controller and speaker.
+# hdaudio (実験的)
+Intel HDオーディオコントローラ＆スピーカー用のデバイスドライバです。
 
-Currently, this driver is an experimental implementation and it
-just play a hard-coded sound data forever.
+現在のところ、このドライバは実験的な実装であり、ハードコーディングされた
+サウンドデータを繰り返し演奏するだけです。
 
-## Building
-You need a wav file (44.1kHz, 16-bits, 2 channels) to play. Generate a `sound_data.h` by `wav2c.py`:
+## ビルド
+演奏するwavファイル (44.1kHz, 16-bits, 2 channels) が必要です。
+`wav2c.py` を実行して `sound_data.h` を生成してください。
+
 ```
 $ cd servers/experimental/hdaudio
 $ ./wav2c.py <your_wav_file>
 ```
 
-## Testing on QEMU
-Enable the Intel HD audio device by `HD_AUDIO`:
+## QEMU上でのテスト
+`HD_AUDIO`によりIntel HDオーディオデバイスを
+ゆうこうにしてください。:
 
 ```
 $ make run HD_AUDIO=y
 ```
 
-## References
+## 参考資料
 - [ATA PIO Mode - OSDev Wiki](https://wiki.osdev.org/ATA_PIO_Mode)
 
-## Source Location
-[servers/drivers/blk/ide](https://github.com/nuta/resea/tree/master/servers/drivers/blk/ide)
+## ソースコード
+[servers/drivers/blk/ide](https://github.com/zuki/resea/tree/master/servers/drivers/blk/ide)

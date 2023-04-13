@@ -5,4 +5,4 @@
 
 ## ソースコード
 
-[servers/apps/memory_leak_test](https://github.com/nuta/resea/tree/master/servers/apps/memory_leak_test)
+[servers/apps/memory_leak_test](https://github.com/zuki/resea/tree/master/servers/apps/memory_leak_test)

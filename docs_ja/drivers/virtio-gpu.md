@@ -11,4 +11,4 @@ virtio-gpu バージョン1.x (so-called *modern device*)とバージョン0.x
 
 ## ソースコード
 
-[servers/drivers/gpu/virtio_gpu](https://github.com/nuta/resea/tree/master/servers/drivers/gpu/virtio_gpu)
+[servers/drivers/gpu/virtio_gpu](https://github.com/zuki/resea/tree/master/servers/drivers/gpu/virtio_gpu)

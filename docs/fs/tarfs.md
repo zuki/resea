@@ -5,4 +5,4 @@ file system which loads files from a tarball.
 Usually, tarfs is used for debugging.
 
 ## Source Location
-[servers/fs/tarfs](https://github.com/nuta/resea/tree/master/servers/fs/tarfs)
+[servers/fs/tarfs](https://github.com/zuki/resea/tree/master/servers/fs/tarfs)

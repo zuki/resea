@@ -7,4 +7,4 @@ TODO: Ask me to write if you need :)
 ## References
 
 ## Source Location
-[libs/third_party/libc](https://github.com/nuta/resea/tree/master/libs/third_party/libc)
+[libs/third_party/libc](https://github.com/zuki/resea/tree/master/libs/third_party/libc)

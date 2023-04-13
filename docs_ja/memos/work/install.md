@@ -1,7 +1,7 @@
 # Resea インストール
 
 ```
-$ git clone -o upstream https://github.com/nuta/resea.git
+$ git clone -o upstream https://github.com/zuki/resea.git
 Cloning into 'resea'...
 remote: Enumerating objects: 15400, done.
 remote: Counting objects: 100% (829/829), done.

@@ -19,5 +19,5 @@ error_t ipc_serve(const char *name);
 task_t ipc_lookup(const char *name);
 ```
 
-この関数は指定した名前のサーバが登録されるまでブロックし、サーバのタスクIDを
-返します。
+この関数は指定した名前のサーバが登録されるまでブロックし、
+サーバのタスクIDを返します。

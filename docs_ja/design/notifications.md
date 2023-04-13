@@ -54,4 +54,4 @@ Reseaでデッドロックを回避するにはどうすればよいのでしょ
           非同期に通知する
 ```
 
-詳細は[非同期IPC](../userspace/async-message-passing)を参照してください。
+詳細は[非同期IPC](../userspace/async-message-passing.html)を参照してください。

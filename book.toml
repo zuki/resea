@@ -7,7 +7,7 @@ title = "Reseaドキュメント"
 
 [output.html]
 default-theme = "rust"
-git-repository-url = "https://github.com/nuta/resea"
+git-repository-url = "https://github.com/zuki/resea"
 
 [output.html.fold]
 enable = false

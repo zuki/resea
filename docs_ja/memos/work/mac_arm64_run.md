@@ -2534,3 +2534,467 @@ shell> [vm] malloc: size=0x30, bin_idx=6
 [shell] allocated=0xc1fbe40
 shell> QEMU: Terminated
 ```
+
+## user.ldを修正してvmのエラーは消えたがストールする
+
+```
+$ make run
+       RUN  build/kernel8.img
+bcm2835_property: 0x00038002 set clock rate NYI
+
+Booting Resea v0.9.0 (2b2e8e9)...
+[kernel] Booting CPU #1...
+[kernel] Booting CPU #2...
+[kernel] Booting CPU #3...
+[kernel] new task #1: vm (pager=(null))
+[kernel] boot ELF: entry=00000000001166f8
+[kernel] boot ELF: 0000000000100000 -> 0000000000092000 (5060KiB)
+[kernel] boot ELF: 00000000005f1000 -> 0000000000583000 (52KiB)
+[kernel] boot ELF: 00000000005fe000 -> 0000000000000000 (4300KiB, zeroed)
+[kernel] new task #0: (idle) (pager=(null))
+[kernel] Booted CPU #0
+[vm] starting...
+[vm] available RAM region #0: 0000000003000000-0000000008670000 (86MiB)
+[vm] launching dm...
+[kernel] new task #2: dm (pager=vm)
+[vm] launching ramdisk...
+[kernel] new task #3: ramdisk (pager=vm)
+[vm] launching random...
+[kernel] new task #4: random (pager=vm)
+[vm] launching shell...
+[kernel] new task #5: shell (pager=vm)
+[vm] ready
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=0000000003001000
+[vm] map_page: task=1, kpage=0000000003002000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=0000000003002000
+[vm] map_page: task=2, kpage=0000000003003000
+[vm] map_page: task=2, kpage=0000000003004000
+[vm] map_page: task=2, kpage=0000000003005000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003006000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003006000
+[vm] map_page: task=3, kpage=0000000003007000
+[vm] map_page: task=3, kpage=0000000003008000
+[vm] map_page: task=3, kpage=0000000003009000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=000000000300a000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=000000000300a000
+[vm] map_page: task=4, kpage=000000000300b000
+[vm] map_page: task=4, kpage=000000000300c000
+[vm] map_page: task=4, kpage=000000000300d000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=000000000300e000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=000000000300e000
+[vm] map_page: task=5, kpage=000000000300f000
+[vm] map_page: task=5, kpage=0000000003010000
+[vm] map_page: task=5, kpage=0000000003011000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=0000000003012000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=0000000003012000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003013000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003013000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=0000000003014000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=0000000003014000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=0000000003015000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=0000000003015000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=0000000003016000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=0000000003016000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003017000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003017000
+[vm] map_page: task=3, kpage=0000000003018000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=0000000003019000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=0000000003019000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=000000000301a000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=000000000301a000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=000000000301b000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=000000000301b000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=000000000301c000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=000000000301c000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=000000000301d000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=000000000301d000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=000000000301e000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=000000000301e000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=000000000301f000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=000000000301f000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003020000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003020000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=0000000003021000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=0000000003021000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=0000000003022000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=0000000003022000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=0000000003023000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=0000000003023000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003024000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003024000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=0000000003025000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=0000000003025000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=0000000003026000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=0000000003026000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=0000000003027000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=0000000003027000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003028000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003028000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=0000000003029000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=0000000003029000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=000000000302a000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=000000000302a000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=000000000302b000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=000000000302b000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=000000000302c000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=000000000302c000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=000000000302d000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=000000000302d000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=000000000302e000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=000000000302e000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=000000000302f000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=000000000302f000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003030000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003030000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=0000000003031000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=0000000003031000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=0000000003032000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=0000000003032000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=0000000003033000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=0000000003033000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003034000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003034000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=0000000003035000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=0000000003035000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=0000000003036000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=0000000003036000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=0000000003037000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=0000000003037000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003038000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003038000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=0000000003039000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=0000000003039000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=000000000303a000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=000000000303a000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=000000000303b000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=000000000303b000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=000000000303c000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=000000000303c000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=000000000303d000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=000000000303d000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=000000000303e000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=000000000303e000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=000000000303f000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=000000000303f000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003040000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003040000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=0000000003041000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=0000000003041000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=0000000003042000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=0000000003042000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=0000000003043000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=0000000003043000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003044000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003044000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=0000000003045000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=0000000003045000
+[kernel] IPC: page_fault_reply: vm -> random
+[random] starting...
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=0000000003046000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=0000000003046000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=0000000003047000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=0000000003047000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003048000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003048000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=0000000003049000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=0000000003049000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=000000000304a000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=000000000304a000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=000000000304b000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=000000000304b000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: ool.recv: ramdisk -> vm
+[kernel] IPC: ool.recv_reply: vm -> ramdisk
+[kernel] IPC: page_fault: random -> vm
+[vm] map_page: task=1, kpage=000000000304c000
+[vm] main: task=4, pager=1
+[vm] map_page: task=4, kpage=000000000304c000
+[kernel] IPC: page_fault_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=000000000304d000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=000000000304d000
+[kernel] IPC: page_fault_reply: vm -> shell
+[shell] starting...
+shell> [kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=000000000304e000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=000000000304e000
+[kernel] IPC: page_fault_reply: vm -> dm
+[dm] starting...
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=000000000304f000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=000000000304f000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: ool.recv: random -> vm
+[kernel] IPC: ool.recv_reply: vm -> random
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=0000000003050000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=0000000003050000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=0000000003051000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=0000000003051000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: ool.send: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003051000
+[kernel] IPC: ool.send_reply: vm -> ramdisk
+[kernel] IPC: ool.send: random -> vm
+[kernel] IPC: page_fault: shell -> vm
+[vm] map_page: task=1, kpage=0000000003052000
+[vm] main: task=5, pager=1
+[vm] map_page: task=5, kpage=0000000003052000
+[kernel] IPC: page_fault_reply: vm -> shell
+[kernel] IPC: page_fault: dm -> vm
+[vm] map_page: task=1, kpage=0000000003053000
+[vm] main: task=2, pager=1
+[vm] map_page: task=2, kpage=0000000003053000
+[kernel] IPC: page_fault_reply: vm -> dm
+[kernel] IPC: discovery.serve: ramdisk -> vm
+[kernel] IPC: discovery.serve_reply: vm -> ramdisk
+[vm] map_page: task=1, kpage=0000000003053000
+[kernel] IPC: ool.send_reply: vm -> random
+[kernel] IPC: ool.recv: shell -> vm
+[kernel] IPC: ool.recv_reply: vm -> shell
+[kernel] IPC: ool.recv: dm -> vm
+[kernel] IPC: ool.recv_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003054000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003054000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[kernel] IPC: discovery.serve: random -> vm
+[kernel] IPC: discovery.serve_reply: vm -> random
+[random] ready
+[kernel] IPC: ool.send: dm -> vm
+[vm] map_page: task=1, kpage=0000000003054000
+[kernel] IPC: ool.send_reply: vm -> dm
+[kernel] IPC: page_fault: ramdisk -> vm
+[vm] map_page: task=1, kpage=0000000003055000
+[vm] main: task=3, pager=1
+[vm] map_page: task=3, kpage=0000000003055000
+[kernel] IPC: page_fault_reply: vm -> ramdisk
+[ramdisk] ready
+[kernel] IPC: discovery.serve: dm -> vm
+[kernel] IPC: discovery.serve_reply: vm -> dm
+[dm] ready
+QEMU: Terminated
+dspace@mini:~/hobby_os/resea$
+```
+
+### ログ出力を削除
+
+```
+Booting Resea v0.9.0 (2b2e8e9)...
+[kernel] Booting CPU #1...
+[kernel] Booting CPU #2...
+[kernel] Booting CPU #3...
+[kernel] new task #1: vm (pager=(null))
+[kernel] boot ELF: entry=00000000001165c8
+[kernel] boot ELF: 0000000000100000 -> 0000000000092000 (5060KiB)
+[kernel] boot ELF: 00000000005f1000 -> 0000000000583000 (52KiB)
+[kernel] boot ELF: 00000000005fe000 -> 0000000000000000 (4300KiB, zeroed)
+[kernel] new task #0: (idle) (pager=(null))
+[kernel] Booted CPU #0
+[vm] starting...
+[vm] available RAM region #0: 0000000003000000-0000000008670000 (86MiB)
+[vm] launching dm...
+[kernel] new task #2: dm (pager=vm)
+[vm] launching ramdisk...
+[kernel] new task #3: ramdisk (pager=vm)
+[vm] launching random...
+[kernel] new task #4: random (pager=vm)
+[vm] launching shell...
+[kernel] new task #5: shell (pager=vm)
+[vm] ready
+[random] starting...
+[shell] starting...
+shell> [dm] starting...     # ここに shellプロンプトは出ているが
+[random] ready
+[ramdisk] ready
+[dm] ready                  # ここでストール
+```

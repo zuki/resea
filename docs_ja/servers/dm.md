@@ -5,4 +5,4 @@
 
 ## ソースコード
 
-[servers/dm](https://github.com/nuta/resea/tree/master/servers/dm)
+[servers/dm](https://github.com/zuki/resea/tree/master/servers/dm)

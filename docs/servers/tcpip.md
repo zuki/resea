@@ -11,4 +11,4 @@ A TCP/IP server (`tcpip`) implements popular internet protocols.
 - DNS client
 
 ## Source Location
-[servers/tcpip](https://github.com/nuta/resea/tree/master/servers/tcpip)
+[servers/tcpip](https://github.com/zuki/resea/tree/master/servers/tcpip)

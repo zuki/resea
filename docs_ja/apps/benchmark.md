@@ -7,5 +7,5 @@ IPCベンチマークを行うには`benchmark_server`を有効にする必要�
 
 ## ソースコード
 
-[servers/apps/benchmark](https://github.com/nuta/resea/tree/master/servers/apps/benchmark)
-と [servers/apps/benchmark_server](https://github.com/nuta/resea/tree/master/servers/apps/benchmark_server)
+[servers/apps/benchmark](https://github.com/zuki/resea/tree/master/servers/apps/benchmark)
+と [servers/apps/benchmark_server](https://github.com/zuki/resea/tree/master/servers/apps/benchmark_server)
