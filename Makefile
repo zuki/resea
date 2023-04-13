@@ -227,6 +227,11 @@ rustdoc:
 		--manifest-path libs/resea/rust/Cargo.toml \
 		--target-dir $(BUILD_DIR)/rustdoc
 
+## Makefile中の変数を見るために使用
+.PHONY: echovars
+echovars:
+	echo $(kernel_objs)
+
 #
 #  Build Rules
 #
