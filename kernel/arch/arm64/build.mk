@@ -8,7 +8,7 @@ CFLAGS += --target=aarch64-none-eabi -mcmodel=large
 CFLAGS += -mgeneral-regs-only
 LDFLAGS += -z max-page-size=4096
 
-QEMUFLAGS += -serial mon:stdio -semihosting -d guest_errors,unimp
+QEMUFLAGS += -M raspi3b -serial mon:stdio -semihosting -d guest_errors,unimp
 QEMUFLAGS += $(if $(GUI),,-nographic)
 QEMUFLAGS += $(if $(GDB),-S -s,)
 

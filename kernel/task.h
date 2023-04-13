@@ -47,50 +47,48 @@ STATIC_ASSERT(TASK_PRIORITY_MAX > 0);
 
 /// The task struct (so-called Task Control Block).
 struct task {
-    /// The arch-specific fields.
+    /// arch固有のフィールド
     struct arch_task arch;
-    /// The task ID. Starts with 1.
+    /// タスクID （1 から始まる）
     task_t tid;
-    /// The state.
+    /// 状態
     int state;
-    /// The name of task terminated by NUL.
+    /// タスク名（NULL終端）
     char name[CONFIG_TASK_NAME_LEN];
-    /// Flags.
+    /// フラグ
     unsigned flags;
-    /// Number of references to this task.
+    /// このタスクを参照しているタスクの数
     unsigned ref_count;
-    /// The pager task. When a page fault or an exception (e.g. divide by zero)
-    /// occurred, the kernel sends a message to the pager to allow it to
-    /// resolve the faults (or kill the task).
+    /// ページャタスク。ページフォルトや例外（ゼロ除算など）が発生すると
+    /// カーネルはこのページ兄メッセージを送信して、フォルトを解決させる
+    /// （または、タスクをkillする）
     struct task *pager;
-    /// The remaining time slice in ticks. If this value reaches 0, the kernel
-    /// switches into the next task (so-called preemptive context switching).
+    /// タイムスライスの残り（ティック単位）。この値が0になったら、カーネルはT
+    /// 次のタスクに切り替える（いわゆるプリエンプティブコンテキストスイッチ）
     int quantum;
-    /// The task priority. The lower value means higher priority. The scheduler
-    /// always picks the runnable task with the highest priority. If there're
-    /// multiple runnable tasks with the same highest priority, the kernel
-    /// schedules in round-robin fashion.
+    /// タスク優先度。小さい値ほど高い優先でを意味する。スケジューラは常に最高の
+    /// 優先度を持つrunnableなタスクを選択する。最高の優先度を持つrunnableタスクが
+    /// 複数ある場合、カーネルはラウンドロビン方式でスケジュールする。
     int priority;
-    /// The message buffer.
+    /// メッセージバッファ
     struct message m;
-    /// The acceptable sender task ID. If it's IPC_ANY, the task accepts
-    /// messages from any tasks.
+    /// 受け入れ可能な送り手ID。IPC_ANYの場合はアスクはすべてのタスクからの
+    /// メッセージを受け入れる。
     task_t src;
-    /// The pending notifications. It's cleared when the task received them as
-    /// an message (NOTIFICATIONS_MSG).
+    /// 保留中の通知。タスクがそれをメッセージ（NOTEIFACTIONS_MSG）として
+    /// 受信するとクリアされる。
     notifications_t notifications;
-    /// The IPC timeout in milliseconds. When it become 0, the kernel notify the
-    /// task with `NOTIFY_TIMER`.
+    /// IPCタイムアウト（ミリ秒単位）。0になるとカーネルはタスクに`NOTIFY_TIMER`を
+    /// 通知する。
     msec_t timeout;
-    /// The queue of tasks that are waiting for this task to get ready for
-    /// receiving a message. If this task gets ready, it resumes all threads in
-    /// this queue.
+    /// このタスクのメッセージを受信できるようになるのを待っているタスクのキュー。
+    /// このタスクが準備できた場合、このキューにあるすべてのスレッドを再開させる。
     list_t senders;
-    /// A (intrusive) list element in the runqueue.
+    /// runキューの（intrusiveな）リスト要素。
     list_elem_t runqueue_next;
-    /// A (intrusive) list element in a sender queue.
+    /// senderキューの（intrusiveな）リスト要素。
     list_elem_t sender_next;
-    /// Capabilities (bitmap).
+    /// ケーパビリティ（ビットマップ）
     uint8_t caps[BITMAP_SIZE(CAP_MAX)];
 };
 
@@ -123,6 +121,7 @@ void task_dump(void);
 void task_init(void);
 
 // Implemented in arch.
+/// in kernel/arch/<arch>/mp.c
 void lock(void);
 void panic_lock(void);
 void unlock(void);
@@ -130,11 +129,14 @@ void mp_start(void);
 int mp_self(void);
 int mp_num_cpus(void);
 void mp_reschedule(void);
+/// in kernel/arch/<arch>/task.c
 __mustuse error_t arch_task_create(struct task *task, vaddr_t ip);
 void arch_task_destroy(struct task *task);
 void arch_task_switch(struct task *prev, struct task *next);
+/// in kernel/arch/x86/interrupt.c, kernel/arch/arm64/macies/raspi3/peripherals.c
 void arch_enable_irq(unsigned irq);
 void arch_disable_irq(unsigned irq);
+/// in kernel/arch/<arch>/vm.c
 __mustuse error_t arch_vm_map(struct task *task, vaddr_t vaddr, paddr_t paddr,
                               paddr_t kpage, unsigned flags);
 __mustuse error_t arch_vm_unmap(struct task *task, vaddr_t vaddr);

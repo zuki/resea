@@ -199,6 +199,7 @@ enum exception_type {
 /// The vm server's task ID.
 #define VM_TASK INIT_TASK
 
+/// libs/common/arch/<arch>/arch_types.h
 #include <arch_types.h>
 
 #endif

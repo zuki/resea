@@ -15,10 +15,10 @@ void arch_idle(void) {
     while (true) {
         unlock();
         // Enable IRQ.
-        __asm__ __volatile__("msr daifclr, #2");
-        __asm__ __volatile__("wfi");
+        __asm__ __volatile__("msr daifclr, #2");    // irqを有効に
+        __asm__ __volatile__("wfi");                // wait for interrupt
         // Disable IRQ.
-        __asm__ __volatile__("msr daifset, #2");
+        __asm__ __volatile__("msr daifset, #2");    // irqを無効に
         lock();
     }
 }
@@ -28,8 +28,8 @@ extern char __bss_end[];
 
 __noreturn void mpinit(void) {
     while (true) {
-        __asm__ __volatile__("msr daifset, #2");
-        __asm__ __volatile__("wfe");
+        __asm__ __volatile__("msr daifset, #2");    // irqを無効に
+        __asm__ __volatile__("wfe");                // wait for event
     }
 
     mpmain();

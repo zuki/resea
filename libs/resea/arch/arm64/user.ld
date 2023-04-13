@@ -27,7 +27,6 @@ SECTIONS {
 
     __cmdline = 0x02fff000;
 
-    . = 0x03000000;
     __zeroed_pages = .;
 
     .bss : ALIGN(0x1000) {

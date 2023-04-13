@@ -29,14 +29,12 @@ static int big_lock = UNLOCKED;
 static int lock_owner = NO_LOCK_OWNER;
 
 void lock(void) {
-    return;  // FIXME:
-
     if (mp_self() == lock_owner) {
         PANIC("recursive lock (#%d)", mp_self());
     }
 
     while (!__sync_bool_compare_and_swap(&big_lock, UNLOCKED, LOCKED)) {
-        //        __asm__ __volatile__("");
+        __asm__ __volatile__("wfe");
     }
 
     lock_owner = mp_self();
@@ -47,8 +45,6 @@ void panic_lock(void) {
 }
 
 void unlock(void) {
-    return;  // FIXME:
-
     DEBUG_ASSERT(lock_owner == mp_self());
     lock_owner = NO_LOCK_OWNER;
     __sync_bool_compare_and_swap(&big_lock, LOCKED, UNLOCKED);

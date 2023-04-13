@@ -204,7 +204,7 @@ void main(void) {
                     ipc_reply_err(m.src, ERR_NOT_FOUND);
                     break;
                 }
-
+                //INFO("main: task=%d, pager=%d", task->tid, task->pager);
                 vaddr_t aligned_vaddr =
                     ALIGN_DOWN(m.page_fault.vaddr, PAGE_SIZE);
                 ASSERT_OK(map_page(task, aligned_vaddr, paddr,

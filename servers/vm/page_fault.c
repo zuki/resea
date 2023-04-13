@@ -28,6 +28,7 @@ error_t map_page(struct task *task, vaddr_t vaddr, paddr_t paddr,
         if (err != OK) {
             return err;
         }
+        //INFO("map_page: task=%d, kpage=%p", task->tid, kpage);
 
         err = vm_map(task->tid, vaddr, paddr, kpage, flags);
         switch (err) {
