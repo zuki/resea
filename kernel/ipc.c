@@ -1,3 +1,4 @@
+/** @file ipc.c */
 #include "ipc.h"
 #include "printk.h"
 #include "syscall.h"
@@ -6,9 +7,14 @@
 #include <string.h>
 #include <types.h>
 
-/// Resumes a sender task for the `receiver` tasks and updates `receiver->src`
-/// properly.
+/** @ingroup ipc
+ * `receiver`タスクのsenderタスクを再開し、`receiver->src`プロパティを更新する.
+ * @param receiver receiverタスクへのポインタ
+ * @param src 送信元タスクへのポインタ
+ */
 static void resume_sender(struct task *receiver, task_t src) {
+    // 1. srcがIPC_ANYの場合は最初のsender、またはsrcがreceiverのsendersリストにある
+    //    senderの場合は、senderを再開してserndersリストから削除する
     LIST_FOR_EACH (sender, &receiver->senders, struct task, sender_next) {
         if (src == IPC_ANY || src == sender->tid) {
             DEBUG_ASSERT(sender->state == TASK_BLOCKED);
@@ -16,8 +22,8 @@ static void resume_sender(struct task *receiver, task_t src) {
             task_resume(sender);
             list_remove(&sender->sender_next);
 
-            // If src == IPC_ANY, allow only `sender` to send a message. Let's
-            // consider the following situation to understand why:
+            // src == IPC_ANY の場合、`sender` にのみメッセージの送信を許可する。
+            // その理由を理解するために次のような状況を考える:
             //
             //     [Sender A]              [Receiver C]              [Sender B]
             //         .                        |                        |
@@ -31,26 +37,34 @@ static void resume_sender(struct task *receiver, task_t src) {
             //         V                        |                        |
             //         |                        |                        |
             //
-            // When (X) occurrs, the receiver should not accept the message
-            // from B since C has already resumed A as the next sender.
-            //
+            // (X)が発生した場合、CはすでにAを次の送信者として再開しているため、
+            // receiverはBからのメッセージを受け取るべきではない
+
+            // 2. receiverのsrcを更新する
             receiver->src = sender->tid;
             return;
         }
     }
-
+    // 2. receiverのsrcを指定のsrcに更新する
     receiver->src = src;
 }
 
-/// Sends and receives a message. Note that `m` is a user pointer if
-/// IPC_KERNEL is not set!
+/** @ingroup ipc
+ * メッセージを送信して受信する（低速版）.
+ * @param dst 送信先タスクへのポインタ
+ * @param src 送信元タスクへのポインタ
+ * @param m メッセージ構造体へのポインタ. IPC_KERNELがセットされていない場合は
+ *          ユーザポインタ
+ * @param flags IPCフラグ
+ * @return 送受信がすべて正常終了したら OK; それ以外は error_t 型のエラーコード
+ */
 static error_t ipc_slowpath(struct task *dst, task_t src,
                             __user struct message *m, unsigned flags) {
-    // Send a message.
+    // 1. メッセージを送信する.
     if (flags & IPC_SEND) {
-        // Copy the message into the receiver's buffer in case the receiver is
-        // the current's pager task and accessing `m` cause the page fault. If
-        // it happens, it leads to a dead lock.
+        // 1.1. 受信者がカレントページャタスクで、`m`にアクセスするとページフォルトが
+        // 発生する場合に備えて、受信者のバッファにメッセージをコピーしておく。
+        // この条件が発生した場合、デッドロックが発生する。
         struct message tmp_m;
         if (flags & IPC_KERNEL) {
             memcpy(&tmp_m, (const void *) m, sizeof(struct message));
@@ -58,22 +72,23 @@ static error_t ipc_slowpath(struct task *dst, task_t src,
             memcpy_from_user(&tmp_m, m, sizeof(struct message));
         }
 
-        // Check whether the destination (receiver) task is ready for receiving.
+        // 1.2. 送信先タスク(receiver)の受信準備ができているかチェックする。
         bool receiver_is_ready =
             dst->state == TASK_BLOCKED
             && (dst->src == IPC_ANY || dst->src == CURRENT->tid);
+        // 1.3. 準備ができていない場合
         if (!receiver_is_ready) {
+            // 3.1 IPC_NOBLOCKがセットされている場合はエラー
             if (flags & IPC_NOBLOCK) {
                 return ERR_WOULD_BLOCK;
             }
 
-            // The receiver task is not ready. Sleep until it resumes the
-            // current task.
+            // 3.2 reciverがカレントタスクを再開させるまでsleepする
             CURRENT->src = IPC_DENY;
             task_block(CURRENT);
             list_push_back(&dst->senders, &CURRENT->sender_next);
             task_switch();
-
+            // 3.3 アボート通知で起こされた場合はエラーとする
             if (CURRENT->notifications & NOTIFY_ABORTED) {
                 // The receiver task has exited. Abort the system call.
                 CURRENT->notifications &= ~NOTIFY_ABORTED;
@@ -81,16 +96,16 @@ static error_t ipc_slowpath(struct task *dst, task_t src,
             }
         }
 
-        // We've gone beyond the point of no return. We must not abort the
-        // sending from here: don't return an error or cause a page fault!
+        // もう戻れないところまで来てしまった。ここから送信を中止してはいけない。
+        // エラーを返したり、ページフォルトを起こしたりしてはいけない！
         //
-        // If you need to do so, push CURRENT back into the senders queue.
+        // そうする必要がある場合は、CURRENTを送信者キューに押し戻すこと。
 
-        // Copy the message.
+        // 1.4. メッセージをコピーする
         tmp_m.src = (flags & IPC_KERNEL) ? KERNEL_TASK : CURRENT->tid;
         memcpy(&dst->m, &tmp_m, sizeof(dst->m));
 
-        // Resume the receiver task.
+        // 1.5. receiverタスクを再開させる.
         task_resume(dst);
 
 #ifdef CONFIG_TRACE_IPC
@@ -99,33 +114,36 @@ static error_t ipc_slowpath(struct task *dst, task_t src,
 #endif
     }
 
-    // Receive a message.
+    // 2. メッセージを受信する
     if (flags & IPC_RECV) {
         struct message tmp_m;
+        // 2.1 すべてのタスクから受信する設定で、保留されている通知がある場合
         if (src == IPC_ANY && CURRENT->notifications) {
-            // Receive pending notifications as a message.
+            // 2.1.1 保留されている通知をメッセージとして受信する
             bzero(&tmp_m, sizeof(tmp_m));
             tmp_m.type = NOTIFICATIONS_MSG;
             tmp_m.src = KERNEL_TASK;
             tmp_m.notifications.data = CURRENT->notifications;
             CURRENT->notifications = 0;
         } else {
+            // 2.1 以外の場合
+            // 2.2.1 ブロックしない設定があったらエラーとする
             if ((flags & IPC_NOBLOCK) != 0) {
                 return ERR_WOULD_BLOCK;
             }
 
-            // Resume a sender task and sleep until a sender task resumes this
-            // task...
+            // 2.2.2 senderタスクを再開して、senderがこのタスクを再開するまでsleepする
             resume_sender(CURRENT, src);
             task_block(CURRENT);
             task_switch();
 
-            // Copy into `tmp_m` since memcpy_to_user may cause a page fault and
-            // CURRENT->m will be overwritten by page fault mesages.
+            // 2.2.3 memocpy_to_userはページフォルトを発生させる可能性があり、その場合
+            //       CURRENT->mはページフォルトメッセージで上書きされてしまうので
+            //       `tmp_m`にコピーしておく。
             memcpy(&tmp_m, &CURRENT->m, sizeof(struct message));
         }
 
-        // Received a message. Copy it into the receiver buffer.
+        // 3. メッセージを受信し、receiverのバッファにコピーする
         if (flags & IPC_KERNEL) {
             memcpy((void *) m, &tmp_m, sizeof(struct message));
         } else {
@@ -136,34 +154,41 @@ static error_t ipc_slowpath(struct task *dst, task_t src,
     return OK;
 }
 
-/// The IPC fastpath: an IPC implementation optimized for the common case.
-///
-/// Note that `m` is a user pointer if IPC_KERNEL is not set!
+/** @ingroup ipc
+ * メッセージを送信して受信する（高速版）. 一般的なケースに最適化したIPCの実装。
+ * @param dst 送信先タスクへのポインタ
+ * @param src 送信元タスクへのポインタ
+ * @param m メッセージ構造体へのポインタ. IPC_KERNELがセットされていない場合は
+ *          ユーザポインタ
+ * @param flags IPCフラグ
+ * @return 送受信がすべて正常終了したら OK; それ以外は error_t 型のエラーコード
+ */
 error_t ipc(struct task *dst, task_t src, __user struct message *m,
             unsigned flags) {
+    // 1. 自分宛てに送信したらエラー
     if (dst == CURRENT) {
         WARN_DBG("%s: tried to send a message to myself", CURRENT->name);
         return ERR_INVALID_ARG;
     }
 
 #ifdef CONFIG_IPC_FASTPATH
-    // Check if the message can be sent in the fastpath.
+    // 2. メッセージが高速経路で送信できるかチェックする
     DEBUG_ASSERT((flags & IPC_SEND) == 0 || dst);
     int fastpath =
-        // The fastpath implements only ipc_call() and ipc_replyrecv().
+        // 高速版は ipc_call()とipc_replyrecv()歯科実装していない
         (flags & ~IPC_NOBLOCK) == IPC_CALL
-        // The receiver is already waiting for us.
+        // receiverはすでに送信元を待っている
         && dst->state == TASK_BLOCKED
         && (dst->src == IPC_ANY || dst->src == CURRENT->tid)
-        // The fastpath doesn't receive pending notifications.
+        // 高速版は保留通知を受信しない
         && CURRENT->notifications == 0;
-
+    // 3. 高速版を使えない場合は低速版を使用する
     if (!fastpath) {
         return ipc_slowpath(dst, src, m, flags);
     }
 
-    // THe send phase: copy the message and resume the receiver task. Note
-    // that this user copy may cause a page fault.
+    // 4. 送信フェーズ: メッセージをコピーしてreceiverタスクを再開させる。
+    //    このユーザコピーはページフォルトを発生する可能性があることに注意。
     memcpy_from_user(&dst->m, m, sizeof(struct message));
     dst->m.src = CURRENT->tid;
     task_resume(dst);
@@ -173,14 +198,13 @@ error_t ipc(struct task *dst, task_t src, __user struct message *m,
           CURRENT->name, dst->name);
 #    endif
 
-    // The receive phase: wait for a message, copy it into the user's
-    // buffer, and return to the user.
+    // 5. 受信フェーズ: メッセージを待機し、ユーザバッファにコピーし、ユーザに返す。
     resume_sender(CURRENT, src);
     task_block(CURRENT);
     task_switch();
 
-    // This user copy should not cause a page fault since we've filled the
-    // page in the user copy above.
+    // 上のユーザコピーでページを設定しているので、このユーザコピーでは
+    // ページフォルトは発生しないはず。
     memcpy_to_user(m, &CURRENT->m, sizeof(struct message));
     return OK;
 #else
@@ -188,18 +212,22 @@ error_t ipc(struct task *dst, task_t src, __user struct message *m,
 #endif  // CONFIG_IPC_FASTPATH
 }
 
-// Notifies notifications to the task.
+/** @ingroup ipc
+ * 他スックにnotificationsを通知する.
+ * @param dst 送信先タスクへのポインタ
+ * @param notifictions 通知情報
+ */
 void notify(struct task *dst, notifications_t notifications) {
     if (dst->state == TASK_BLOCKED && dst->src == IPC_ANY) {
-        // Send a NOTIFICATIONS_MSG message immediately.
+        // 1. 直ちに NOTIFICATIONS_MSG メッセージを送信する
         dst->m.type = NOTIFICATIONS_MSG;
         dst->m.src = KERNEL_TASK;
         dst->m.notifications.data = dst->notifications | notifications;
         dst->notifications = 0;
         task_resume(dst);
     } else {
-        // The task is not ready for receiving a event message: update the
-        // pending notifications instead.
+        // 2. タスクがイベントメッセージを受信する準備ができていない。
+        //    メッセージを送信する代わりに保留中notificationを更新する。
         dst->notifications |= notifications;
     }
 }
