@@ -12,10 +12,12 @@ SECTIONS {
         *(.text*)
     } :text
 
+    /* raddiskではrodata領域にディスクが作成される */
     .rodata :{
         *(.rodata*)
     } :text
 
+    /* :dataプログラムヘッダの先頭 */
     .data : ALIGN(0x1000) {
         *(.data*)
 
@@ -25,8 +27,11 @@ SECTIONS {
         __stack_end = .;
     } :data
 
-    __cmdline = 0x02fff000;
-
+    /* この'.'の設定は:bssプログラムヘッダの先頭を設定     */
+    /* ramdiskでrodataに大きな領域が作成され、デフォルト値 */
+    /* では領域が交差してエラー。アライメント以外に意味は  */
+    /* なさなのでアライメントだけすることにした            */
+    . = ALIGN(0x1000);
     __zeroed_pages = .;
 
     .bss : ALIGN(0x1000) {
@@ -38,6 +43,8 @@ SECTIONS {
         *(.bss*);
         __bss_end = .;
     } :bss
+
+    __cmdline = 0x02fff000;
 
     . = 0x03000000;
     __zeroed_pages_end = .;
