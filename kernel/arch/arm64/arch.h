@@ -1,3 +1,4 @@
+/** @file arch.h */
 #ifndef __ARCH_H__
 #define __ARCH_H__
 
@@ -12,27 +13,41 @@
 #define STRAIGHT_MAP_ADDR 0x00000000            // 未使用
 #define STRAIGHT_MAP_END  0x3f000000            // 未使用
 
+/** @ingroup arm64
+ * @struct arch_task
+ * @brief ARM64固有のタスク構造体.
+ */
 struct arch_task {
-    vaddr_t syscall_stack;
-    vaddr_t stack;
-    /// The level-0 page table.
-    uint64_t *page_table;
-    /// The user's page table paddr.
-    paddr_t ttbr0;
+    vaddr_t syscall_stack;      /**< システムコール用のスタックポインタ */
+    vaddr_t stack;              /**< タスク用のスタックポインタ */
+    uint64_t *page_table;       /**< レベル0のページテーブル*/
+    paddr_t ttbr0;              /**< ユーザ用ページテーブルの物理アドレス */
 };
 
-/// 物理アドレスから仮想アドレスへの変換
+/** @ingroup arm64
+ * @brief 物理アドレスから仮想アドレスに変換する.
+ * @param addr 物理アドレス
+ * @return 仮想アドレス
+ */
 static inline void *paddr2ptr(paddr_t addr) {
     return (void *) (addr + KERNEL_BASE_ADDR);
 }
 
-
-/// 仮想アドレスから物理アドレスへの変換
+/** @ingroup arm64
+ * @brief 仮想アドレスから物理アドレスに変換する.
+ * @param addr 仮想アドレス
+ * @return 物理アドレス
+ */
 static inline paddr_t ptr2paddr(void *addr) {
     return ((vaddr_t) addr - KERNEL_BASE_ADDR);
 }
 
-/// baseとbase+lenがカーネルアドレス範囲内にあるかチェック
+/** @ingroup arm64
+ * @brief 指定の仮想アドレス範囲がカーネル空間にあるかチェックする.
+ * @param base 開始アドレス
+ * @param len 長さ
+ * @return 範囲内にあれば true; そうでなければ false
+ */
 static inline bool is_kernel_addr_range(vaddr_t base, size_t len) {
     // 最初の式は整数のオーバーフローが生じていないかチェックしている
     return base + len < len || base >= KERNEL_BASE_ADDR
@@ -43,19 +58,29 @@ static inline bool is_kernel_addr_range(vaddr_t base, size_t len) {
 extern char __kernel_image[];
 extern char __kernel_image_end[];
 
-/// paddrがカーネルアドレスであるかをチェック
+/** @ingroup arm64
+ * @brief 指定の物理アドレスがカーネルアドレスであるかをチェックする.
+ * @param pbase 物理アドレス
+ * @param len 長さ
+ * @return カーネルアドレスであれば true; そうでなければ false
+ */
 static inline bool is_kernel_paddr(paddr_t paddr) {
     return (paddr_t) __kernel_image <= paddr
            && paddr <= (paddr_t) __kernel_image_end;
 }
 
-
-/// カレントタスクを実行しているCPU番号を返す
+/** @ingroup arm64
+ * @brief カレントタスクを実行しているコア番号を返す.
+ * @return コア番号
+ */
 static inline int mp_self(void) {
     return ARM64_MRS(mpidr_el1) & 0xff;
 }
 
-/// カレントタスクの実行CPUがbspであるかをチェック
+/** @ingroup arm64
+ * @brief カレントタスクの実行コアがbspであるかをチェックする.
+ * @return bspなら true; apなら false
+ */
 static inline bool mp_is_bsp(void) {
     return mp_self() == 0;
 }
@@ -63,6 +88,11 @@ static inline bool mp_is_bsp(void) {
 struct arch_cpuvar {};
 
 struct cpuvar *arm64_get_cpuvar(void);
+
+/** @ingroup arm64
+ * @brief カレントタスクの実行コアのローカル情報を取得する.
+ * @return ローカル情報へのポインタ
+ */
 static inline struct cpuvar *get_cpuvar(void) {
     return arm64_get_cpuvar();
 }

@@ -1,3 +1,4 @@
+/** @file boot.S */
 #include "boot.h"
 #include "kdebug.h"
 #include "printk.h"
@@ -11,6 +12,10 @@
 extern uint8_t __bootelf[];
 extern uint8_t __bootelf_end[];
 
+/** @ingroup kernel
+ * @brief bootelfヘッダーを取得する
+ * @return bootelfヘッダーへのポインタ. 規定の位置にヘッダーがない場合はpanic.
+ */
 static struct bootelf_header *locate_bootelf_header(void) {
     const offset_t offsets[] = {
         0x1000,   // x64
@@ -21,6 +26,8 @@ static struct bootelf_header *locate_bootelf_header(void) {
         struct bootelf_header *header =
             (struct bootelf_header *) &__bootelf[offsets[i]];
         if (!memcmp(header, BOOTELF_MAGIC, sizeof(header->magic))) {
+            // FIXME: arm64でもoffsets[0]にヒットしている模様
+            //INFO("locate_bootelf[%d]: %s 0x%p\n", i, header->name, header);
             return header;
         }
     }
@@ -29,14 +36,18 @@ static struct bootelf_header *locate_bootelf_header(void) {
 }
 
 #if !defined(CONFIG_NOMMU)
-/// Allocates a memory page for the first user task.
+/** @ingroup kernel
+ * @brief 最初のユーザタスク用にメモリページを割り当てる.
+ * @param bootinfo ブート情報構造体へのポインタ
+ * @return メモリページへのポインタ（仮想アドレス）
+ */
 static void *alloc_page(struct bootinfo *bootinfo) {
     for (int i = 0; i < NUM_BOOTINFO_MEMMAP_MAX; i++) {
         struct bootinfo_memmap_entry *m = &bootinfo->memmap[i];
         if (m->type != BOOTINFO_MEMMAP_TYPE_AVAILABLE) {
             continue;
         }
-
+        // 利用可能なメモリマップ要素の現在のbaseから1ページ割り当てる
         if (m->len >= PAGE_SIZE) {
             ASSERT(IS_ALIGNED(m->base, PAGE_SIZE));
             void *ptr = paddr2ptr(m->base);
@@ -49,6 +60,16 @@ static void *alloc_page(struct bootinfo *bootinfo) {
     PANIC("run out of memory for the initial task's memory space");
 }
 
+/** @ingroup kernel
+ * @brief boot ELFのELFセグメントを仮想メモリにマッピングする.
+ * @param bootinof ブート情報へのポインタ
+ * @param task タスクへのポインタ
+ * @param vaddr 仮想アドレス
+ * @param paddr 物理アドレス
+ * @param flags MAP_TYPEフラグ
+ * @return 成功した場合はアドレス（NULLもあり）、
+ *         それ以外はerror_t型のエラーコード
+ */
 static error_t map_page(struct bootinfo *bootinfo, struct task *task,
                         vaddr_t vaddr, paddr_t paddr, unsigned flags) {
     static paddr_t unused_kpage = 0;
@@ -68,7 +89,12 @@ static error_t map_page(struct bootinfo *bootinfo, struct task *task,
 }
 #endif
 
-// Maps ELF segments in the boot ELF into virtual memory.
+/** @ingroup kernel
+ * @brief boot ELFのELFセグメントを仮想メモリにマッピングする.
+ * @param bootinof ブート情報へのポインタ
+ * @param header ブートELFヘッダーへのポインタ
+ * @param task タスクへのポインタ
+ */
 static void map_bootelf(struct bootinfo *bootinfo,
                         struct bootelf_header *header, struct task *task) {
     TRACE("boot ELF: entry=%p", header->entry);
@@ -98,6 +124,7 @@ static void map_bootelf(struct bootinfo *bootinfo,
         ASSERT(IS_ALIGNED(paddr, PAGE_SIZE));
 
         if (m->zeroed) {
+            // (.bss, __zeroed_pages_endまで) ページを割り当て、0詰めして、マッピング
             for (size_t j = 0; j < m->num_pages; j++) {
                 void *page = alloc_page(bootinfo);
                 ASSERT(page);
@@ -108,6 +135,7 @@ static void map_bootelf(struct bootinfo *bootinfo,
                 vaddr += PAGE_SIZE;
             }
         } else {
+            // マッピングだけ (.text, .rodata, .data)
             for (size_t j = 0; j < m->num_pages; j++) {
                 error_t err =
                     map_page(bootinfo, task, vaddr, paddr, MAP_TYPE_READWRITE);
@@ -120,47 +148,66 @@ static void map_bootelf(struct bootinfo *bootinfo,
     }
 }
 
-/// Initializes the kernel and starts the first task.
+/** @ingroup kernel
+ * @brief カーネルを初期化して最初のタスクを開始する.
+ * @param bootinfo
+ */
 __noreturn void kmain(struct bootinfo *bootinfo) {
+    // 1. Resea起動表示
     printf("\nBooting Resea " VERSION " (" GIT_REVISION ")...\n");
+    // 2. タスクサブシステムの初期化
     task_init();
+    // 3. cpu1-3を起動する
     mp_start();
 
-    // Look for the boot elf header.
+    // 4. boot elf headerを探す.
     char name[CONFIG_TASK_NAME_LEN];
     struct bootelf_header *bootelf = locate_bootelf_header();
     strncpy2(name, (const char *) bootelf->name,
             MIN(sizeof(name), sizeof(bootelf->name)));
 
-    // Copy the bootinfo struct to the boot elf header.
+    // 5. bootinfoをboot elf headerにコピーする
 #ifndef CONFIG_NOMMU
     // FIXME: Support NOMMU: bootelf->bootinfo could exist in ROM.
     memcpy(&bootelf->bootinfo, bootinfo, sizeof(*bootinfo));
 #endif
 
-    // Create the first userland task.
+    // 6. 最初のユーザランドタスクを作成する
+    // 6.1 task構造体を取得する
     struct task *task = task_lookup_unchecked(INIT_TASK);
     ASSERT(task);
+    // 6.2 taskを作成する
     error_t err = task_create(task, name, bootelf->entry, NULL, TASK_ALL_CAPS);
     ASSERT_OK(err);
+    // 6.3 bootelfを仮想空間にマッピングする
     map_bootelf(bootinfo, bootelf, task);
-
+    // 7. cpuのメイン処理
     mpmain();
 }
 
+/** @ingroup kernel
+ * @brief 各CPUのメイン処理.
+ */
 __noreturn void mpmain(void) {
+    // 1. スタックが溢れていないかチェック
     stack_set_canary();
 
-    // Initialize the idle task for this CPU.
+    // 2. このCPU用のアイドルタスクを初期化する
+    // 2.1 アイドルタスクのタスクIDは0
     IDLE_TASK->tid = 0;
+    // 2.2 アイドルタスクを作成
     error_t err = task_create(IDLE_TASK, "(idle)", 0, NULL, 0);
     ASSERT_OK(err);
+    // 2.3 カレントタスクをアイドルタスクとする
     CURRENT = IDLE_TASK;
 
-    // Start context switching and enable interrupts...
+    // 3. ブートは完了
     INFO("Booted CPU #%d", mp_self());
+    // 4. 現在のところ、cpu1-3はmpmain()は呼び出されないので
+    //    panicにはならないはず
     if (!mp_is_bsp()) {
         PANIC("TODO: Support context switching in SMP");
     }
+    // 5. コンテキストスイッチを可能にし、割り込みを有効にして割り込みを待つ
     arch_idle();
 }

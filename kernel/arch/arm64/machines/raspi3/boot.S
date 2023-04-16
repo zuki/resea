@@ -1,6 +1,9 @@
 .section ".boot", "ax"
 .global boot
 boot:
+    // 最初はCPU0からしか呼ばれない。CPUが起動してmachine_mp_start()
+    // を実行して初めてcpu1-3はこの関数を実行する。
+
     // boot: i/Dキャッシュが無効な点がxv6と異なる、それ以外は同じ
     ldr  x0, =0x30d00980 // リトルエンディアン, MMU無効, I/D-キャッシュ無効, RES1
     msr  sctlr_el1, x0
@@ -14,7 +17,7 @@ boot:
     eret
 
 el1_mode:
-    // Read the CPU ID.
+    // CPU IDを読み取る
     mrs  x1, mpidr_el1
     and  x1, x1, #3
 
@@ -24,10 +27,10 @@ el1_mode:
     add  x2, x2, #0x1000
     madd x4, x3, x1, x2 // x4 = x3 * x1 + x2 = PAGE_SIZE * cpu_id + x2
     mov  sp, x4
-    cbz x1, bsp_boot
+    cbz x1, bsp_boot    // cpu0 (bsp)はbsp_bootへ分岐
 
 ap_boot:
-    b enable_mmu
+    b enable_mmu        // cpu1-3 (ap)はenable_mmuへ分岐
 
 bsp_boot:
     // カーネルページテーブルの構築.
@@ -110,12 +113,12 @@ enable_mmu:
     br   x1
 
 mmu_enabled:
-    // Update SP to use the upper address.
+    // 上位アドレス（kernel）を使用するためにSPを更新する
     mov  x0, sp
     ldr  x1, =0xffff000000000000
     orr  x0, x0, x1
     mov  sp, x0
-
+    // arm64_init(): kernel/arch/arm64/init.cにあり
     ldr  x0, =arm64_init
     br   x0
 
@@ -123,6 +126,7 @@ halt:
     wfi
     b  halt
 
+// 最初のタスク(vm.elf)を.rodataに埋め込む
 .rodata
 .balign 4096
 .global __bootelf

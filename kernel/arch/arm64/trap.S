@@ -1,5 +1,5 @@
 //
-//  Exception Vector
+//  例外ベクタ
 //
 .balign 2048
 .global exception_vector
@@ -40,7 +40,7 @@ exception_vector:
     b exception_common
     .balign 128
 
-/// Saves the exception context *except* X0 onto the stack.
+/// x0以外の例外コンテキストをスタックに保存する
 .macro save_context
     stp  x1,  x2,  [sp, #-16]!
     stp  x3,  x4,  [sp, #-16]!
@@ -58,9 +58,9 @@ exception_vector:
     stp  x27, x28, [sp, #-16]!
     stp  x29, x30, [sp, #-16]!
 
-    // Because a page fault may occur in a usercopy function during the system
-    // call handling (i.e. nested exception), we save the exception context on
-    // the stack.
+    // システムコール処理中にユーザコピー関数でページフォルトが
+    // 発生する可能性があるため（入れ子の例外となる）、例外
+    // コンテキストをスタックに保存する
     mrs  x9, spsr_el1
     mrs  x10, elr_el1
     mrs  x11, sp_el0
@@ -68,7 +68,7 @@ exception_vector:
     stp  x11, x12, [sp, #-16]!
 .endm
 
-/// Restores the exception context *except* X0.
+/// x0以外の例外コンテキストを復元する
 .macro restore_context
     ldp  x11, x12, [sp], #16
     ldp  x9,  x10, [sp], #16
@@ -94,26 +94,28 @@ exception_vector:
     eret
 .endm
 
+// 共通割り込みハンドラ
 interrupt_common:
     save_context
 
-    // Exceptions except SVC.
+    // arm固有ハンドラの前後でx0を保存/復元
     stp  x0, xzr, [sp, #-16]!
     bl   arm64_handle_interrupt
     ldp  x0, xzr, [sp], #16
 
     restore_context
 
+// 共通例外ハンドラ
 exception_common:
     save_context
 
-    // Determine if the exception is a system call.
+    // 例外がシステムコールか確認する
     mrs  x9, esr_el1
     lsr  x9, x9, #26
     cmp  x9, 0x15
-    bne  1f
+    bne  1f         // 違う -> 1f
 
-    // SVC handling. We don't preserve x0 as it contains the return value.
+    // SVCの処理。x0は返り値が設定されるので保存しない
     bl   handle_syscall
     b    2f
 1:

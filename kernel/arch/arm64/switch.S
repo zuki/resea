@@ -3,7 +3,7 @@
 // void arm64_task_switch(vaddr_t *prev_sp, vaddr_t next_sp);
 .global arm64_task_switch
 arm64_task_switch:
-    // Save callee-saved registers.
+    // callee-saved レジスタを保存する
     stp  x20, x19, [sp, #-16]!
     stp  x22, x21, [sp, #-16]!
     stp  x24, x23, [sp, #-16]!
@@ -11,7 +11,7 @@ arm64_task_switch:
     stp  x28, x27, [sp, #-16]!
     stp  x30, x29, [sp, #-16]!
 
-    // Switch the stack pointer.
+    // スタックポインタを切り替える
     mov  x9, sp
     str  x9, [x0]
     mov  sp, x1
