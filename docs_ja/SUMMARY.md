@@ -75,6 +75,7 @@
     - [install](memos/work/install.md)
     - [run_mac](memos/work/run_mac.md)
     - [mac_arm64_run](memos/work/mac_arm64_run.md)
+    - [Makefileを読む](memos/work/makefile.md)
     - [要検討](memos/work/fixme.md)
   - [調査メモ](memos/study/README.md)
     - [bootfs](memos/study/bootfs.md)
