@@ -87,9 +87,9 @@ void arm64_init(void) {
         UNREACHABLE();
     }
 
-    // 以降はcpu0 (bsp) だけが十個する
+    // 以降はcpu0 (bsp) だけが実行する
 
-    // 3. 以後、下位アドレスにアクセス必要はない（FIXME: ユーザ空間は?)
+    // 3. 以後、下位アドレスにアクセスする必要はない（FIXME: ユーザ空間は?)
     ARM64_MSR(ttbr0_el1, 0ull);
 
     // 4. CPUローカル変数、.bss領域を0クリア
