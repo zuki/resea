@@ -1,5 +1,5 @@
-# CONFIG_BUILD_DEBUG is not set
-CONFIG_BUILD_RELEASE=y
+CONFIG_BUILD_DEBUG=y
+# CONFIG_BUILD_RELEASE is not set
 CONFIG_MODULES=y
 
 #
@@ -30,29 +30,25 @@ CONFIG_HELLO_SERVER=m
 # end of Hello World
 
 # CONFIG_HELLO_FROM_RUST_SERVER is not set
-CONFIG_MEMORY_LEAK_TEST_SERVER=m
-CONFIG_SHM_TEST_SERVER=m
-CONFIG_TEST_SERVER=m
-
-#
-# Kernel/Userland integrated tests
-#
+# CONFIG_MEMORY_LEAK_TEST_SERVER is not set
+# CONFIG_SHM_TEST_SERVER is not set
+# CONFIG_TEST_SERVER is not set
 # CONFIG_WEBAPI_SERVER is not set
 # end of Applications
 
 CONFIG_DM_SERVER=y
-CONFIG_EXAMPLE_SERVER=m
+# CONFIG_EXAMPLE_SERVER is not set
 # CONFIG_HV_SERVER is not set
 # CONFIG_MINLIN_SERVER is not set
-CONFIG_RANDOM_SERVER=y
+# CONFIG_RANDOM_SERVER is not set
 CONFIG_SHELL_SERVER=y
-CONFIG_TCPIP_SERVER=y
+# CONFIG_TCPIP_SERVER is not set
 
 #
 # Block Drivers
 #
-CONFIG_IDE_SERVER=y
-CONFIG_RAMDISK_SERVER=y
+# CONFIG_IDE_SERVER is not set
+# CONFIG_RAMDISK_SERVER is not set
 # end of Block Drivers
 
 #
@@ -70,34 +66,34 @@ CONFIG_RAMDISK_SERVER=y
 #
 # Network Drivers
 #
-CONFIG_E1000_SERVER=y
+# CONFIG_E1000_SERVER is not set
 # CONFIG_VIRTIO_NET_SERVER is not set
 # end of Network Drivers
 
 #
 # Real Time Clock Drivers
 #
-CONFIG_RTC_SERVER=y
+# CONFIG_RTC_SERVER is not set
 # end of Real Time Clock Drivers
 
 #
 # Experimental Apps/Servers/Drivers
 #
-CONFIG_DATETIME_SERVER=y
+# CONFIG_DATETIME_SERVER is not set
 # CONFIG_HDAUDIO_SERVER is not set
 # end of Experimental Apps/Servers/Drivers
 
 #
 # File Systems
 #
-CONFIG_FATFS_SERVER=y
+# CONFIG_FATFS_SERVER is not set
 # CONFIG_TARFS_SERVER is not set
 # end of File Systems
 # end of Servers and Applications
 
-CONFIG_ARCH_ARM64=y
 # CONFIG_ARCH_X64 is not set
 # CONFIG_ARCH_EXAMPLE is not set
+CONFIG_ARCH_ARM64=y
 CONFIG_ARCH="arm64"
 # CONFIG_BOOT_TASK_NOMMU_TEST is not set
 CONFIG_BOOT_TASK_VM=y
