@@ -1,6 +1,8 @@
 //
 //  例外ベクタ
-//
+//    EL1/SP0, EL1/SPx, EL0/aarch64, EL0/aarch32
+//      EL1/SPxとEL0/aarch64だけ有効
+//    例外タイプ: 同期例外, IRQ, FIQ, SError
 .balign 2048
 .global exception_vector
 exception_vector:
@@ -113,13 +115,13 @@ exception_common:
     mrs  x9, esr_el1
     lsr  x9, x9, #26
     cmp  x9, 0x15
-    bne  1f         // 違う -> 1f
+    bne  1f
 
     // SVCの処理。x0は返り値が設定されるので保存しない
     bl   handle_syscall
     b    2f
 1:
-    // Exceptions except SVC.
+    // SVC以外の例外の処理
     stp  x0, xzr, [sp, #-16]!
     bl   arm64_handle_exception
     ldp  x0, xzr, [sp], #16

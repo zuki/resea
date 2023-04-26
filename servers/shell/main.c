@@ -15,12 +15,20 @@ static void skip_whitespaces(char **cmdline) {
     }
 }
 
+/** @ingroup shell
+ * @brief コマンドライン入力文字列をパースしてargv[]に設定する
+ * @param comdline コマンドライン入力文字列
+ * @param argv 設定するargv[]へのポインタ
+ * @param argv_max argv[]の最大インデックス
+ * @param argv[]の要素数
+*/
 static int parse(char *cmdline, char **argv, int argv_max) {
+    // 前方の空白を削除して、NULLなら終了
     skip_whitespaces(&cmdline);
     if (*cmdline == '\0') {
         return 0;
     }
-
+    // コマンドラインからargv[]を設定する
     int argc = 1;
     argv[0] = cmdline;
     while (*cmdline != '\0') {
@@ -41,13 +49,19 @@ static int parse(char *cmdline, char **argv, int argv_max) {
     return argc;
 }
 
+/** @ingroup shell
+ * @brief argv[]からコマンドラインを作成してvmに起動を依頼する.
+ * @param argc 引数の数
+ * @param argv[] 引数配列
+ */
 static void launch_task(int argc, char **argv) {
-    // Construct a cmdline from argv.
+    // argvからコマンドラインを構築する
+    // 作成するコマンドラインの長さを計算する
     size_t len = 0;
     for (int i = 0; i < argc; i++) {
-        len += strlen(argv[i]) + 1 /* whitespace or '\0' */;
+        len += strlen(argv[i]) + 1 /* +1は空白か'\0' */;
     }
-
+    // コマンドライン用のメモリを割り当て、argv[]を空白を挟んでコピーする
     char *name_and_cmdline = malloc(len);
     size_t offset = 0;
     for (int i = 0; i < argc; i++) {
@@ -56,11 +70,13 @@ static void launch_task(int argc, char **argv) {
         name_and_cmdline[offset++] = ' ';
     }
     name_and_cmdline[offset - 1] = '\0';
-
+    // メッセージを作成してipc_call()
     struct message m;
     m.type = TASK_LAUNCH_MSG;
     m.task_launch.name_and_cmdline = name_and_cmdline;
     error_t err = ipc_call(VM_TASK, &m);
+    // コマンドライン用のメモリを開放して終了
+    //  vm/main.cの処理関数内でもfree()しているがfree()は引数がNULLならそのままreturnするのでOK
     free(name_and_cmdline);
     if (err != OK) {
         WARN("failed to launch '%s': %s", argv[0], err2str(err));
@@ -68,13 +84,14 @@ static void launch_task(int argc, char **argv) {
 }
 
 static void run(char *cmdline) {
+    // コマンドライン文字列をパース
     int argv_max = 8;
     char **argv = malloc(sizeof(char *) * argv_max);
     int argc = parse(cmdline, argv, argv_max);
     if (!argc) {
         return;
     }
-
+    // シェル内部コマンドの場合はコマンド関数を実行する
     for (int i = 0; commands[i].name != NULL; i++) {
         if (!strcmp(commands[i].name, argv[0])) {
             commands[i].run(argc, argv);
@@ -82,7 +99,7 @@ static void run(char *cmdline) {
         }
     }
 
-    // No internal commands for `cmdline`. Try launching a task from vm.
+    // 内部コマンドでなければvmにタスクの起動を依頼する
     launch_task(argc, argv);
 }
 
@@ -95,9 +112,10 @@ static void read_input(void) {
     char buf[256];
     static char cmdline[512];
     static int cmdline_index = 0;
+    size_t i;
 
     OOPS_OK(sys_console_read(buf, sizeof(buf)));
-    for (size_t i = 0; i < sizeof(buf) && buf[i] != '\0'; i++) {
+    for (i = 0; i < sizeof(buf) && buf[i] != '\0'; i++) {
         PRINTF("%c", buf[i]);
         switch (buf[i]) {
             case '\n':
@@ -132,15 +150,14 @@ static void read_input(void) {
                 }
         }
     }
-
+    TRACE("read i=%d", i);
     printf_flush();
 }
 
 void main(void) {
+    int count = 0;
     TRACE("starting...");
-#ifdef CONFIG_ARCH_X64
     ASSERT_OK(irq_acquire(CONSOLE_IRQ));
-#endif
     // The mainloop: receive and handle messages.
     prompt("");
     while (true) {
@@ -150,6 +167,7 @@ void main(void) {
 
         switch (m.type) {
             case NOTIFICATIONS_MSG:
+                TRACE("[SHELL] nofified %d");
                 if (m.notifications.data & NOTIFY_IRQ) {
                     read_input();
                 }
