@@ -75,11 +75,13 @@ void uart_init(void) {
     mmio_write(GPIO_PUDCLK0, 0);
 
     mmio_write(UART0_CR, 0);            // Disable UART.
-    mmio_write(UART0_ICR, 0x7ff);       // Disable interrupts from UART.
+    mmio_write(UART0_ICR, 0x7f2);       // Disable interrupts from UART.
     mmio_write(UART0_IBRD, 2);          // baud rate = 115200
     mmio_write(UART0_FBRD, 11);         //
-    mmio_write(UART0_LCRH, 0b11 << 5);  // 8n1
+    mmio_write(UART0_LCRH, 0b11 << 5);  // 8 bit, No parity, 1 Stopbit, Disable FIFO
+    mmio_write(UART0_IMSC, 0x70);       // RTIM, TXIM, RXIM を有効に
     mmio_write(UART0_CR, 0x301);        // Enable RX, TX, and UART0.
+    mmio_write(ENABLE_IRQS_2, 1 << (CONSOLE_IRQ % 32)); // GPU割り込み(uart_int)を有効にする
 }
 
 /** @ingroup arm64
@@ -98,7 +100,6 @@ int kdebug_readchar(void) {
     if (!kdebug_is_readable()) {
         return -1;
     }
-
     return mmio_read(UART0_DR);
 }
 
@@ -145,9 +146,22 @@ static void timer_init(void) {
 }
 
 /** @ingroup arm64
+ * @brief 割り込みをを初期化する.
+ */
+static void irq_init(void) {
+    // GPU割り込みをCore0に転送させる
+    mmio_write(GPU_INT_ROUTE, 0);
+    mmio_write(FIQ_CONTROL, 0);
+    mmio_write(DISABLE_IRQS_1, (uint32_t)-1);
+    mmio_write(DISABLE_IRQS_2, (uint32_t)-1);
+    mmio_write(DISABLE_BASIC_IRQS, (uint32_t)-1);
+}
+
+/** @ingroup arm64
  * @brief ペリフェラルを初期化する.
  */
 void arm64_peripherals_init(void) {
+    irq_init();
     uart_init();
 #ifdef CONFIG_FORCE_REBOOT_BY_WATCHDOG
     watchdog_init();

@@ -440,14 +440,7 @@ void handle_timer_irq(void) {
  * @param irq 割り込み番号
  */
 void handle_irq(unsigned irq) {
-    static int count = 0;
     struct task *owner = irq_owners[irq];
-
-#if 1
-    if (irq == 57 && ++count < 10) {
-        INFO("handle_irq: irq = %d, owner[%d]=%s", irq, owner->tid, owner->name);
-    }
-#endif
 
     // 1. irqの所有者に割り込みを通知する。
     if (owner) {

@@ -1,4 +1,5 @@
 #include "asm.h"
+#include "arch.h"
 #include <config.h>
 #include <machine/peripherals.h>
 #include <printk.h>
@@ -15,8 +16,21 @@ extern char arm64_usercopy3[];  // これは未定義
  * @brief ARM64固有の割り込みハンドラ.
  */
 void arm64_handle_interrupt(void) {
-    arm64_timer_reload();
-    handle_timer_irq();
+    int src = mmio_read(IRQ_SRC_CORE(mp_self()));
+    if (src & IRQ_SRC_CHNTVIRQ) {
+        arm64_timer_reload();
+        handle_timer_irq();
+    }
+    if (src & IRQ_SRC_GPU) {
+        uint64_t irq = mmio_read(PENDING_IRQS_1) | (((uint64_t)mmio_read(PENDING_IRQS_2)) << 32);
+        //INFO("irq=0x%#llx", irq);
+        if (irq & (1UL << IRQ_57_UART)) {
+            if (mmio_read(UART0_MIS) & (1 << 4)) {
+                handle_irq(IRQ_57_UART);
+            }
+            mmio_write(UART0_ICR, 0x70);   // 0x20はTXINTR, RXINTRは0x10
+        }
+    }
 }
 
 /** @ingroup arm64

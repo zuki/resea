@@ -150,7 +150,6 @@ static void read_input(void) {
                 }
         }
     }
-    TRACE("read i=%d", i);
     printf_flush();
 }
 
@@ -167,7 +166,6 @@ void main(void) {
 
         switch (m.type) {
             case NOTIFICATIONS_MSG:
-                TRACE("[SHELL] nofified %d");
                 if (m.notifications.data & NOTIFY_IRQ) {
                     read_input();
                 }
