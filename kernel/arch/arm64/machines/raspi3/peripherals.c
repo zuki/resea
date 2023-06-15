@@ -63,12 +63,15 @@ void uart_init(void) {
     delay(150);
     mmio_write(GPIO_PUDCLK0, 0);
 
+    // FIFOは無効、割り込みは有効(UART0_IMSC=0x0)
     mmio_write(UART0_CR, 0);            // Disable UART.
-    mmio_write(UART0_ICR, 0x7ff);       // Disable interrupts from UART.
+    mmio_write(UART0_ICR, 0x7ff);       // UARTからの割り込みをクリア
     mmio_write(UART0_IBRD, 2);          // baud rate = 115200
     mmio_write(UART0_FBRD, 11);         //
     mmio_write(UART0_LCRH, 0b11 << 5);  // 8n1
+    mmio_write(UART0_IMSC, 1 << 4);     // Enable RX interrupt
     mmio_write(UART0_CR, 0x301);        // Enable RX, TX, and UART0.
+    mmio_write(ENABLE_IRQS_2, 1 << (CONSOLE_IRQ % 32));
 }
 
 bool kdebug_is_readable(void) {

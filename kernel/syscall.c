@@ -258,11 +258,11 @@ static int sys_console_read(__user char *buf, int max_len) {
     if (!max_len) {
         return 0;
     }
-
+    
     int i = 0;
     for (; i < max_len - 1; i++) {
-        char ch;
-        if ((ch = kdebug_readchar()) <= 0) {
+        int ch;
+        if ((ch = (int)kdebug_readchar()) <= 0) {
             break;
         }
 

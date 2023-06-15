@@ -6,7 +6,7 @@ RAM_DISK_IMG ?= $(BUILD_DIR)/ramdisk.img
 
 $(BUILD_DIR)/servers/drivers/blk/ramdisk/disk.o: $(RAM_DISK_IMG)
 	$(PROGRESS) "GEN" $@
-	echo ".rodata; .align 4096; .global __image, __image_end; __image: .incbin \"$<\"; __image_end:" > $(@:.o=.S)
+	echo ".rodata; .balign 4096; .global __image, __image_end; __image: .incbin \"$<\"; __image_end:" > $(@:.o=.S)
 	$(CC) $(CFLAGS) -o $@ -c $(@:.o=.S)
 
 $(RAM_DISK_IMG):

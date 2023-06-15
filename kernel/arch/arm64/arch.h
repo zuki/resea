@@ -7,7 +7,7 @@
 
 #define STACK_SIZE        4096
 #define TICK_HZ           1000
-#define IRQ_MAX           32
+#define IRQ_MAX           64
 #define KERNEL_BASE_ADDR  0xffff000000000000
 #define STRAIGHT_MAP_ADDR 0x03000000
 #define STRAIGHT_MAP_END  0x3f000000

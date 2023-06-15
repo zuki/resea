@@ -7,6 +7,7 @@
 // TODO: Let me know if you know the location of the BCM2837 datasheet!
 
 #define MMIO_BASE  0x3f000000
+#define LOCAL_BASE 0x40000000
 #define UART0_DR   (MMIO_BASE + 0x00201000)  // Data register.
 #define UART0_FR   (MMIO_BASE + 0x00201018)  // Flag register.
 #define UART0_IBRD (MMIO_BASE + 0x00201024)  // Integer baud rate divisor.
@@ -14,6 +15,7 @@
     (MMIO_BASE + 0x00201028)  // Fractional part of the baud rate divisor.
 #define UART0_LCRH (MMIO_BASE + 0x0020102c)  // Line control registe.
 #define UART0_CR   (MMIO_BASE + 0x00201030)  // Control register.
+#define UART0_IMSC (MMIO_BASE + 0x00201038)  // Interrupt Mask Set Clear register.
 #define UART0_ICR  (MMIO_BASE + 0x00201044)  // Interrupt clear register.
 #define GPIO_FSEL1 (MMIO_BASE + 0x00200004)  // GPIO Function Select 1.
 #define GPIO_PUD   (MMIO_BASE + 0x00200094)  // GPIO Pin Pull-up/down Enable.
@@ -28,6 +30,26 @@
 #define MBOX_CONFIG (MMIO_BASE + 0xb880 + 0x1C)
 #define MBOX_WRITE  (MMIO_BASE + 0xb880 + 0x20)
 
+// BCM2837割り込みレジスタ
+#define IRQ_BASIC_PENDING       (MMIO_BASE + 0xb200)
+#define PENDING_IRQS_1          (MMIO_BASE + 0xb204)
+#define PENDING_IRQS_2          (MMIO_BASE + 0xb208)
+#define FIQ_CONTROL             (MMIO_BASE + 0xb20C)
+#define ENABLE_IRQS_1           (MMIO_BASE + 0xb210)
+#define ENABLE_IRQS_2           (MMIO_BASE + 0xb214)
+#define ENABLE_BASIC_IRQS       (MMIO_BASE + 0xb218)
+#define DISABLE_IRQS_1          (MMIO_BASE + 0xb21C)
+#define DISABLE_IRQS_2          (MMIO_BASE + 0xb220)
+#define DISABLE_BASIC_IRQS      (MMIO_BASE + 0xb224)
+
+// BCM2837 ARMローカルペリフェラル
+#define GPU_INT_ROUTE		(LOCAL_BASE + 0x0C)
+#define IRQ_SRC_CORE(core)	(LOCAL_BASE + 0x60 + 4 * (core))
+#define IRQ_SRC_TIMER		(1 << 11)
+#define IRQ_SRC_GPU		(1 << 8)
+#define IRQ_SRC_CNTVIRQ		(1 << 3)
+#define IRQ_SRC_CNTPNSIRQ	(1 << 1)
+#define IRQ_57_UART		(57)
 //
 //  Mailbox - An interface to communicate with VideoCore (GPU) on Raspberry Pi.
 //  https://github.com/raspberrypi/firmware/wiki/Mailboxes

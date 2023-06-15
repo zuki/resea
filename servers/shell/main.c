@@ -101,6 +101,7 @@ static void read_input(void) {
         PRINTF("%c", buf[i]);
         switch (buf[i]) {
             case '\n':
+            case '\r':
                 cmdline[cmdline_index] = '\0';
                 printf("\e[0m");
                 printf_flush();

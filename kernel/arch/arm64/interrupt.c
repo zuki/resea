@@ -12,8 +12,18 @@ extern char arm64_usercopy2[];
 extern char arm64_usercopy3[];
 
 void arm64_handle_interrupt(void) {
-    arm64_timer_reload();
-    handle_timer_irq();
+    int src = mmio_read(IRQ_SRC_CORE(mp_self()));
+    if (src & IRQ_SRC_CNTVIRQ) {
+        arm64_timer_reload();
+        handle_timer_irq();
+    }
+    if (src & IRQ_SRC_GPU) {
+        uint64_t irq = mmio_read(PENDING_IRQS_1) | (((uint64_t)mmio_read(PENDING_IRQS_2)) << 32);
+        if (irq & (1UL << IRQ_57_UART)) {
+            handle_irq(IRQ_57_UART);
+            mmio_write(UART0_ICR, 0x3ff);
+        }
+    }
 }
 
 void arm64_handle_exception(void) {
