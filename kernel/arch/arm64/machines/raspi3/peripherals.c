@@ -75,11 +75,11 @@ void uart_init(void) {
     mmio_write(GPIO_PUDCLK0, 0);
 
     mmio_write(UART0_CR, 0);            // Disable UART.
-    mmio_write(UART0_ICR, 0x7f2);       // Disable interrupts from UART.
+    mmio_write(UART0_ICR, 0x7ff);       // UARTからの割り込みをクリア
     mmio_write(UART0_IBRD, 2);          // baud rate = 115200
     mmio_write(UART0_FBRD, 11);         //
     mmio_write(UART0_LCRH, 0b11 << 5);  // 8 bit, No parity, 1 Stopbit, Disable FIFO
-    mmio_write(UART0_IMSC, 0x70);       // RTIM, TXIM, RXIM を有効に
+    mmio_write(UART0_IMSC, 1 << 4);     // Enable RX interrupt
     mmio_write(UART0_CR, 0x301);        // Enable RX, TX, and UART0.
     mmio_write(ENABLE_IRQS_2, 1 << (CONSOLE_IRQ % 32)); // GPU割り込み(uart_int)を有効にする
 }
@@ -89,7 +89,7 @@ void uart_init(void) {
  * @return あれば true; なければ false
  */
 bool kdebug_is_readable(void) {
-    return (mmio_read(UART0_FR) & (1 << 4)) == 0;
+    return (mmio_read(UART0_FR) & (1 << 4)) == 0;   // 入力しても0にならない
 }
 
 /** @ingroup arm64
@@ -97,9 +97,10 @@ bool kdebug_is_readable(void) {
  * @return 読み込んだ文字、読み込むべき文字がない場合は -1
  */
 int kdebug_readchar(void) {
-    if (!kdebug_is_readable()) {
-        return -1;
-    }
+    if (!kdebug_is_readable()) {    // 常にこの条件が満たされるのでUART0_DRが読まれることがない
+        return -1;                  // この条件を無視して無理やりUART0_DRを読み込むと同じ文字が
+    }                               // 連続的に読み込まれ、UART0_DRのクリアがされないようだ
+                                    // QEMU(hw/char/pl011.c)の問題だと思われるが詳細は不明
     return mmio_read(UART0_DR);
 }
 
@@ -161,7 +162,7 @@ static void irq_init(void) {
  * @brief ペリフェラルを初期化する.
  */
 void arm64_peripherals_init(void) {
-    irq_init();
+    //irq_init();
     uart_init();
 #ifdef CONFIG_FORCE_REBOOT_BY_WATCHDOG
     watchdog_init();

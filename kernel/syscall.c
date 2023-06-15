@@ -363,8 +363,8 @@ static int sys_console_read(__user char *buf, int max_len) {
 
     int i = 0;
     for (; i < max_len - 1; i++) {
-        char ch = (char)kdebug_readchar();
-        if (ch == 0xff || ch == 0) {
+        int ch;
+        if ((ch = (int)kdebug_readchar()) <= 0) {
             break;
         }
         memcpy_to_user(buf + i, &ch, 1);

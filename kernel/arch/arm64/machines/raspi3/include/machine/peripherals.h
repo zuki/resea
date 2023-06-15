@@ -16,6 +16,7 @@
     (MMIO_BASE + 0x00201028)  // Fractional part of the baud rate divisor.
 #define UART0_LCRH (MMIO_BASE + 0x0020102c)  // Line control registe.
 #define UART0_CR   (MMIO_BASE + 0x00201030)  // Control register.
+#define UART0_IFLS (MMIO_BASE + 0x00201034)  // Interrupt FIFO Level Select.
 #define UART0_IMSC (MMIO_BASE + 0x00201038)  // Interrupt Mask Set Clear register.
 #define UART0_RIS  (MMIO_BASE + 0x0020103C)  // Raw Interrupt Status
 #define UART0_MIS  (MMIO_BASE + 0x00201040)  // Masked Interrupt Status.
@@ -55,7 +56,7 @@
 /* GPU割り込み */
 #define IRQ_SRC_GPU             (1 << 8)
 /* CNTVIRQ割り込み */
-#define IRQ_SRC_CHNTVIRQ        (1 << 3)
+#define IRQ_SRC_CNTVIRQ         (1 << 3)
 /* 物理カウンタ割り込み  */
 #define IRQ_SRC_CNTPNSIRQ       (1 << 1)
 
