@@ -59,7 +59,7 @@ error_t ipc_send_noblock(task_t dst, struct message *m);
 
 `ipc_send_noblock`はメッセージの送信を試みます。送付先のタスクがメッセージを
 受け取る準備ができていない場合は、送信元のタスクをブロックする代わりに直ちに
-`ERRO_WOOULD_BLOCK`を返します。
+`ERR_WOULD_BLOCK`を返します。
 
 ## メッセージを受信する
 

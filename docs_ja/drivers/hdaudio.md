@@ -15,7 +15,7 @@ $ ./wav2c.py <your_wav_file>
 
 ## QEMU上でのテスト
 `HD_AUDIO`によりIntel HDオーディオデバイスを
-ゆうこうにしてください。:
+有効にしてください。:
 
 ```
 $ make run HD_AUDIO=y
