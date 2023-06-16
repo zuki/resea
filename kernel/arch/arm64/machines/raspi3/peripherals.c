@@ -89,7 +89,7 @@ void uart_init(void) {
  * @return あれば true; なければ false
  */
 bool kdebug_is_readable(void) {
-    return (mmio_read(UART0_FR) & (1 << 4)) == 0;   // 入力しても0にならない
+    return (mmio_read(UART0_FR) & (1 << 4)) == 0;
 }
 
 /** @ingroup arm64
@@ -97,10 +97,9 @@ bool kdebug_is_readable(void) {
  * @return 読み込んだ文字、読み込むべき文字がない場合は -1
  */
 int kdebug_readchar(void) {
-    if (!kdebug_is_readable()) {    // 常にこの条件が満たされるのでUART0_DRが読まれることがない
-        return -1;                  // この条件を無視して無理やりUART0_DRを読み込むと同じ文字が
-    }                               // 連続的に読み込まれ、UART0_DRのクリアがされないようだ
-                                    // QEMU(hw/char/pl011.c)の問題だと思われるが詳細は不明
+    if (!kdebug_is_readable()) {
+        return -1;
+    }
     return mmio_read(UART0_DR);
 }
 
@@ -147,22 +146,9 @@ static void timer_init(void) {
 }
 
 /** @ingroup arm64
- * @brief 割り込みをを初期化する.
- */
-static void irq_init(void) {
-    // GPU割り込みをCore0に転送させる
-    mmio_write(GPU_INT_ROUTE, 0);
-    mmio_write(FIQ_CONTROL, 0);
-    mmio_write(DISABLE_IRQS_1, (uint32_t)-1);
-    mmio_write(DISABLE_IRQS_2, (uint32_t)-1);
-    mmio_write(DISABLE_BASIC_IRQS, (uint32_t)-1);
-}
-
-/** @ingroup arm64
  * @brief ペリフェラルを初期化する.
  */
 void arm64_peripherals_init(void) {
-    //irq_init();
     uart_init();
 #ifdef CONFIG_FORCE_REBOOT_BY_WATCHDOG
     watchdog_init();

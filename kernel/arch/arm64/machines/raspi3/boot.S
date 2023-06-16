@@ -5,7 +5,7 @@ boot:
     // を実行して初めてcpu1-3はこの関数を実行する。
 
     // boot: i/Dキャッシュが無効な点がxv6と異なる、それ以外は同じ
-    ldr  x0, =0x30d00980 // リトルエンディアン, MMU無効, I/D-キャッシュ無効, RES1
+    ldr  x0, =0x30d00800 // リトルエンディアン, MMU無効, I/D-キャッシュ無効, RES1
     msr  sctlr_el1, x0
     ldr  x0, =0x80000000 // EL1はAArch64.
     msr  hcr_el2, x0
@@ -94,7 +94,7 @@ enable_mmu:
                          // AttrIndx == 1: Device-nGnRnE memory
     msr  mair_el1, x0
                             // 4KB指定が TG1=0b10, TG0=0b00 と異なる
-    ldr  x0, =0xb5103510    // TTBR0/1 共に4KiB ページ、リージョンサイズは 2^48.
+    ldr  x0, =0x35103510    // TTBR0/1 共に4KiB ページ、リージョンサイズは 2^48.
     msr  tcr_el1, x0
 
     adrp x0, __kernel_page_table

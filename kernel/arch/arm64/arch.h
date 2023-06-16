@@ -10,7 +10,7 @@
 #define TICK_HZ           1000
 #define IRQ_MAX           64
 #define KERNEL_BASE_ADDR  0xffff000000000000
-#define STRAIGHT_MAP_ADDR 0x00000000            // 未使用
+#define STRAIGHT_MAP_ADDR 0x03000000            // 未使用
 #define STRAIGHT_MAP_END  0x3f000000            // 未使用
 
 /** @ingroup arm64

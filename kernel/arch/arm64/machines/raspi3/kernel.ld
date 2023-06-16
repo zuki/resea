@@ -2,7 +2,7 @@ ENTRY(boot);
 
 LMA_OFFSET = 0xffff000000000000;
 /* 物理アドレスの上限: 1GB - 76MB (GPU) = 948 MB */
-PHYS_TOP = 0x000000003B400000;
+//PHYS_TOP = 0x000000003B400000;
 
 MEMORY {
     boot_ram (rwx): ORIGIN = 0x0000000000080000, LENGTH = 0x0001000
@@ -44,7 +44,7 @@ SECTIONS {
 
         /* Per-CPU boot stacks (paddr_t)/ */
         __boot_stack_base = . - LMA_OFFSET;
-        . += 0x1000 * 4; /* PAGE_SIZE * NUM_CPUS_MAX */
+        . += 0x1000 * 16; /* PAGE_SIZE * CPU_NUM_MAX */
 
         . = ALIGN(4096);
         __kernel_image_end = . - LMA_OFFSET; /* paddr_t */

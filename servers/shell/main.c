@@ -112,10 +112,9 @@ static void read_input(void) {
     char buf[256];
     static char cmdline[512];
     static int cmdline_index = 0;
-    size_t i;
 
     OOPS_OK(sys_console_read(buf, sizeof(buf)));
-    for (i = 0; i < sizeof(buf) && buf[i] != '\0'; i++) {
+    for (size_t i = 0; i < sizeof(buf) && buf[i] != '\0'; i++) {
         PRINTF("%c", buf[i]);
         switch (buf[i]) {
             case '\n':
@@ -155,9 +154,10 @@ static void read_input(void) {
 }
 
 void main(void) {
-    int count = 0;
     TRACE("starting...");
+
     ASSERT_OK(irq_acquire(CONSOLE_IRQ));
+
     // The mainloop: receive and handle messages.
     prompt("");
     while (true) {

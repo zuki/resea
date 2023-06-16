@@ -8,10 +8,10 @@ CFLAGS += --target=aarch64-none-eabi -mcmodel=large
 CFLAGS += -mgeneral-regs-only
 LDFLAGS += -z max-page-size=4096
 
-QEMUFLAGS += -M raspi3b -serial mon:stdio -semihosting -d guest_errors,unimp
+QEMUFLAGS += -serial mon:stdio -semihosting -d guest_errors,unimp
 QEMUFLAGS += $(if $(GUI),,-nographic)
 QEMUFLAGS += $(if $(GDB),-S -s,)
-QEMUFLAGS += --trace "trace_pl011_*"
+
 .PHONY: run
 run: $(BUILD_DIR)/kernel8.img
 	$(PROGRESS) "RUN" $<

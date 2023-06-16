@@ -48,7 +48,7 @@
 #define DISABLE_BASIC_IRQS      (MMIO_BASE + 0xb224)
 /* BCM2837 ARMローカルペリフェラル */
 /* GPU割り込みルーティング */
-#define GPU_INT_ROUTE           (LOCAL_BASE + 0xC)
+#define GPU_INT_ROUTE           (LOCAL_BASE + 0x0C)
 /* 割り込みソース */
 #define IRQ_SRC_CORE(core)      (LOCAL_BASE + 0x60 + 4 * (core))
 /* ローカルタイマー(clockで使用) */

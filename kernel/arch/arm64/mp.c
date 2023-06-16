@@ -70,12 +70,14 @@ static int lock_owner = NO_LOCK_OWNER;
  */
 void lock(void) {
     // 1. すでにロックの所有者となっている（二重ロック）
+    return;     // FIXME;
+
     if (mp_self() == lock_owner) {
         PANIC("recursive lock (#%d)", mp_self());
     }
     // 2. ロック処理（atomicにロック変数値を変更する）
     while (!__sync_bool_compare_and_swap(&big_lock, UNLOCKED, LOCKED)) {
-        __asm__ __volatile__("wfe");
+        //  __asm__ __volatile__("wfe");
     }
     // 3. ロック所有者をセットする
     lock_owner = mp_self();
@@ -92,6 +94,8 @@ void panic_lock(void) {
  * @brief ロックを解放する.
  */
 void unlock(void) {
+    return;  // FIXME:
+
     DEBUG_ASSERT(lock_owner == mp_self());
     lock_owner = NO_LOCK_OWNER;
     __sync_bool_compare_and_swap(&big_lock, LOCKED, UNLOCKED);

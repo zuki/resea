@@ -1,5 +1,4 @@
 #include "asm.h"
-#include "arch.h"
 #include <config.h>
 #include <machine/peripherals.h>
 #include <printk.h>
