@@ -2998,3 +2998,265 @@ shell> [dm] starting...     # ここに shellプロンプトは出ているが
 [ramdisk] ready
 [dm] ready                  # ここでストール
 ```
+
+## Ubuntu版の修正を適用して正常稼働
+
+```bash
+$ make run
+   OBJCOPY  build/kernel8.img
+       RUN  build/kernel8.img
+bcm2835_property: 0x00038002 set clock rate NYI
+
+Booting Resea v0.9.0 (3ca8c6d)...
+[kernel] Booting CPU #1...
+[kernel] Booting CPU #2...
+[kernel] Booting CPU #3...
+[kernel] new task #1: vm (pager=(null))
+[kernel] boot ELF: entry=00000000001166b8
+[kernel] boot ELF: 0000000000100000 -> 0000000000091000 (4804KiB)
+[kernel] boot ELF: 00000000005b1000 -> 0000000000542000 (52KiB)
+[kernel] boot ELF: 0000000000800000 -> 0000000000000000 (4300KiB, zeroed)
+[kernel] new task #0: (idle) (pager=(null))
+[kernel] Booted CPU #0
+[vm] starting...
+[vm] available RAM region #0: 0000000003000000-000000000863b000 (86MiB)
+[vm] launching dm...
+[kernel] new task #2: dm (pager=vm)
+[vm] launching hello...
+[kernel] new task #3: hello (pager=vm)
+[vm] launching ramdisk...
+[kernel] new task #4: ramdisk (pager=vm)
+[vm] launching shell...
+[kernel] new task #5: shell (pager=vm)
+[vm] ready
+[hello] Hello, World!
+[vm] hello: terminated its execution
+[kernel] destroying hello...
+[dm] starting...
+[shell] starting...
+[kernel] enabled IRQ: task=shell, vector=57
+shell> [dm] ready
+[ramdisk] ready
+[shell] help              -  Print this message.
+[shell] <task> cmdline... -  Launch a task.
+[shell] ps                -  List tasks.
+[shell] q                 -  Halt the computer.
+[shell] fs-read path      -  Read a file.
+[shell] fs-write path str -  Write a string into a file.
+[shell] http-get url      -  Peform a HTTP GET request.
+[kernel] #1 vm: state=blocked, src=0
+[kernel] #2 dm: state=blocked, src=0
+[kernel] #4 ramdisk: state=blocked, src=0
+[kernel] #5 shell: state=runnable, src=0
+shell > q
+$
+```
+
+```diff
+$ git diff 3ca8c6d..a227983
+diff --git a/kernel/arch/arm64/arch.h b/kernel/arch/arm64/arch.h
+index 7c5a9c4..3735306 100644
+--- a/kernel/arch/arm64/arch.h
++++ b/kernel/arch/arm64/arch.h
+@@ -10,7 +10,7 @@
+ #define TICK_HZ           1000
+ #define IRQ_MAX           64
+ #define KERNEL_BASE_ADDR  0xffff000000000000
+-#define STRAIGHT_MAP_ADDR 0x00000000            // 未使用
++#define STRAIGHT_MAP_ADDR 0x03000000            // 未使用
+ #define STRAIGHT_MAP_END  0x3f000000            // 未使用
+
+ /** @ingroup arm64
+diff --git a/kernel/arch/arm64/build.mk b/kernel/arch/arm64/build.mk
+index 4db2cc8..65e4b0f 100644
+--- a/kernel/arch/arm64/build.mk
++++ b/kernel/arch/arm64/build.mk
+@@ -8,10 +8,10 @@ CFLAGS += --target=aarch64-none-eabi -mcmodel=large
+ CFLAGS += -mgeneral-regs-only
+ LDFLAGS += -z max-page-size=4096
+
+-QEMUFLAGS += -M raspi3b -serial mon:stdio -semihosting -d guest_errors,unimp
++QEMUFLAGS += -serial mon:stdio -semihosting -d guest_errors,unimp
+ QEMUFLAGS += $(if $(GUI),,-nographic)
+ QEMUFLAGS += $(if $(GDB),-S -s,)
+-QEMUFLAGS += --trace "trace_pl011_*"
++
+ .PHONY: run
+ run: $(BUILD_DIR)/kernel8.img
+ 	$(PROGRESS) "RUN" $<
+diff --git a/kernel/arch/arm64/interrupt.c b/kernel/arch/arm64/interrupt.c
+index b83de94..1b51cdf 100644
+--- a/kernel/arch/arm64/interrupt.c
++++ b/kernel/arch/arm64/interrupt.c
+@@ -1,5 +1,4 @@
+ #include "asm.h"
+-#include "arch.h"
+ #include <config.h>
+ #include <machine/peripherals.h>
+ #include <printk.h>
+diff --git a/kernel/arch/arm64/machines/raspi3/boot.S b/kernel/arch/arm64/machines/raspi3/boot.S
+index d116ed3..5c1db76 100644
+--- a/kernel/arch/arm64/machines/raspi3/boot.S
++++ b/kernel/arch/arm64/machines/raspi3/boot.S
+@@ -5,7 +5,7 @@ boot:
+     // を実行して初めてcpu1-3はこの関数を実行する。
+
+     // boot: i/Dキャッシュが無効な点がxv6と異なる、それ以外は同じ
+-    ldr  x0, =0x30d00980 // リトルエンディアン, MMU無効, I/D-キャッシュ無効, RES1
++    ldr  x0, =0x30d00800 // リトルエンディアン, MMU無効, I/D-キャッシュ無効, RES1
+     msr  sctlr_el1, x0
+     ldr  x0, =0x80000000 // EL1はAArch64.
+     msr  hcr_el2, x0
+@@ -94,7 +94,7 @@ enable_mmu:
+                          // AttrIndx == 1: Device-nGnRnE memory
+     msr  mair_el1, x0
+                             // 4KB指定が TG1=0b10, TG0=0b00 と異なる
+-    ldr  x0, =0xb5103510    // TTBR0/1 共に4KiB ページ、リージョンサイズは 2^48.
++    ldr  x0, =0x35103510    // TTBR0/1 共に4KiB ページ、リージョンサイズは 2^48.
+     msr  tcr_el1, x0
+
+     adrp x0, __kernel_page_table
+diff --git a/kernel/arch/arm64/machines/raspi3/include/machine/peripherals.h b/kernel/arch/arm64/machines/raspi3/include/machine/peripherals.h
+index b2b6ac9..46839fd 100644
+--- a/kernel/arch/arm64/machines/raspi3/include/machine/peripherals.h
++++ b/kernel/arch/arm64/machines/raspi3/include/machine/peripherals.h
+@@ -48,7 +48,7 @@
+ #define DISABLE_BASIC_IRQS      (MMIO_BASE + 0xb224)
+ /* BCM2837 ARMローカルペリフェラル */
+ /* GPU割り込みルーティング */
+-#define GPU_INT_ROUTE           (LOCAL_BASE + 0xC)
++#define GPU_INT_ROUTE           (LOCAL_BASE + 0x0C)
+ /* 割り込みソース */
+ #define IRQ_SRC_CORE(core)      (LOCAL_BASE + 0x60 + 4 * (core))
+ /* ローカルタイマー(clockで使用) */
+diff --git a/kernel/arch/arm64/machines/raspi3/kernel.ld b/kernel/arch/arm64/machines/raspi3/kernel.ld
+index 57a2ad4..c1559f2 100644
+--- a/kernel/arch/arm64/machines/raspi3/kernel.ld
++++ b/kernel/arch/arm64/machines/raspi3/kernel.ld
+@@ -2,7 +2,7 @@ ENTRY(boot);
+
+ LMA_OFFSET = 0xffff000000000000;
+ /* 物理アドレスの上限: 1GB - 76MB (GPU) = 948 MB */
+-PHYS_TOP = 0x000000003B400000;
++//PHYS_TOP = 0x000000003B400000;
+
+ MEMORY {
+     boot_ram (rwx): ORIGIN = 0x0000000000080000, LENGTH = 0x0001000
+@@ -44,7 +44,7 @@ SECTIONS {
+
+         /* Per-CPU boot stacks (paddr_t)/ */
+         __boot_stack_base = . - LMA_OFFSET;
+-        . += 0x1000 * 4; /* PAGE_SIZE * NUM_CPUS_MAX */
++        . += 0x1000 * 16; /* PAGE_SIZE * CPU_NUM_MAX */
+
+         . = ALIGN(4096);
+         __kernel_image_end = . - LMA_OFFSET; /* paddr_t */
+diff --git a/kernel/arch/arm64/machines/raspi3/peripherals.c b/kernel/arch/arm64/machines/raspi3/peripherals.c
+index ebbb7e6..9f623c9 100644
+--- a/kernel/arch/arm64/machines/raspi3/peripherals.c
++++ b/kernel/arch/arm64/machines/raspi3/peripherals.c
+@@ -89,7 +89,7 @@ void uart_init(void) {
+  * @return あれば true; なければ false
+  */
+ bool kdebug_is_readable(void) {
+-    return (mmio_read(UART0_FR) & (1 << 4)) == 0;   // 入力しても0にならない
++    return (mmio_read(UART0_FR) & (1 << 4)) == 0;
+ }
+
+ /** @ingroup arm64
+@@ -97,10 +97,9 @@ bool kdebug_is_readable(void) {
+  * @return 読み込んだ文字、読み込むべき文字がない場合は -1
+  */
+ int kdebug_readchar(void) {
+-    if (!kdebug_is_readable()) {    // 常にこの条件が満たされるのでUART0_DRが読まれることがない
+-        return -1;                  // この条件を無視して無理やりUART0_DRを読み込むと同じ文字が
+-    }                               // 連続的に読み込まれ、UART0_DRのクリアがされないようだ
+-                                    // QEMU(hw/char/pl011.c)の問題だと思われるが詳細は不明
++    if (!kdebug_is_readable()) {
++        return -1;
++    }
+     return mmio_read(UART0_DR);
+ }
+
+@@ -146,23 +145,10 @@ static void timer_init(void) {
+     mmio_write(TIMER_IRQCNTL(mp_self()), 1 << 3);
+ }
+
+-/** @ingroup arm64
+- * @brief 割り込みをを初期化する.
+- */
+-static void irq_init(void) {
+-    // GPU割り込みをCore0に転送させる
+-    mmio_write(GPU_INT_ROUTE, 0);
+-    mmio_write(FIQ_CONTROL, 0);
+-    mmio_write(DISABLE_IRQS_1, (uint32_t)-1);
+-    mmio_write(DISABLE_IRQS_2, (uint32_t)-1);
+-    mmio_write(DISABLE_BASIC_IRQS, (uint32_t)-1);
+-}
+-
+ /** @ingroup arm64
+  * @brief ペリフェラルを初期化する.
+  */
+ void arm64_peripherals_init(void) {
+-    //irq_init();
+     uart_init();
+ #ifdef CONFIG_FORCE_REBOOT_BY_WATCHDOG
+     watchdog_init();
+diff --git a/kernel/arch/arm64/mp.c b/kernel/arch/arm64/mp.c
+index bc4a655..4881c23 100644
+--- a/kernel/arch/arm64/mp.c
++++ b/kernel/arch/arm64/mp.c
+@@ -70,12 +70,14 @@ static int lock_owner = NO_LOCK_OWNER;
+  */
+ void lock(void) {
+     // 1. すでにロックの所有者となっている（二重ロック）
++    return;     // FIXME;
++
+     if (mp_self() == lock_owner) {
+         PANIC("recursive lock (#%d)", mp_self());
+     }
+     // 2. ロック処理（atomicにロック変数値を変更する）
+     while (!__sync_bool_compare_and_swap(&big_lock, UNLOCKED, LOCKED)) {
+-        __asm__ __volatile__("wfe");
++        //  __asm__ __volatile__("wfe");
+     }
+     // 3. ロック所有者をセットする
+     lock_owner = mp_self();
+@@ -92,6 +94,8 @@ void panic_lock(void) {
+  * @brief ロックを解放する.
+  */
+ void unlock(void) {
++    return;  // FIXME:
++
+     DEBUG_ASSERT(lock_owner == mp_self());
+     lock_owner = NO_LOCK_OWNER;
+     __sync_bool_compare_and_swap(&big_lock, LOCKED, UNLOCKED);
+diff --git a/servers/shell/main.c b/servers/shell/main.c
+index 532b057..09fab66 100644
+--- a/servers/shell/main.c
++++ b/servers/shell/main.c
+@@ -112,10 +112,9 @@ static void read_input(void) {
+     char buf[256];
+     static char cmdline[512];
+     static int cmdline_index = 0;
+-    size_t i;
+
+     OOPS_OK(sys_console_read(buf, sizeof(buf)));
+-    for (i = 0; i < sizeof(buf) && buf[i] != '\0'; i++) {
++    for (size_t i = 0; i < sizeof(buf) && buf[i] != '\0'; i++) {
+         PRINTF("%c", buf[i]);
+         switch (buf[i]) {
+             case '\n':
+@@ -155,9 +154,10 @@ static void read_input(void) {
+ }
+
+ void main(void) {
+-    int count = 0;
+     TRACE("starting...");
++
+     ASSERT_OK(irq_acquire(CONSOLE_IRQ));
++
+     // The mainloop: receive and handle messages.
+     prompt("");
+     while (true) {
+```
