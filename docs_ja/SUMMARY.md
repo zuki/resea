@@ -79,6 +79,6 @@
     - [Makefileを読む](memos/work/makefile.md)
     - [要検討](memos/work/fixme.md)
   - [調査メモ](memos/study/README.md)
-    - [bootfs](memos/study/bootfs.md)
+    - [BootElfとBootFS](memos/study/bootfs.md)
     - [machine_mp_start](memos/study/machine_mp_start.md)
     - [ディレクトリツリー](memos/study/dir_tree.md)

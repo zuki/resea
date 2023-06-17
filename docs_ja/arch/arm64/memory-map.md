@@ -3,7 +3,7 @@
 ```
 LMA_OFFSET = 0xffff000000000000;
 /* 物理アドレスの上限: 1GB - 76MB (GPU) = 948 MB */
-PHYS_TOP = 0x000000003B400000;
+// PHYS_TOP = 0x000000003B400000;
 MEMORY {
     boot_ram (rwx): ORIGIN = 0x0000000000080000, LENGTH = 0x0001000
     ram (rwx):      ORIGIN = 0xffff000000081000, LENGTH = 0x2fff000
@@ -24,14 +24,16 @@ MEMORY {
 ## ユーザ仮想アドレス空間
 
 - `libs/resea/arch/arm64/user.ld`
+- vmやramdiskで大きなファイルを埋め込むため.rodata領域が大きい
 
 | アドレス                                        | サイズ       | 説明                                                                  |
 |-------------------------------------------------|--------------|-----------------------------------------------------------------------|
-| `0x0010_0000 - 0x002f_efff`                     | 2 MiB     | .text, .rodata, .data                                                    |
-| `0x0030_0000 - 0x0031_ffff`                     | 128 KiB   | .heap |
-| `0x0032_0000 - 0x02ff_efff`                     |  44 MiB   | .bss  |
+| `0x0010_0000 - 0x007f_efff`                     | 7 MiB     | .text, .rodata, .data                                                    |
+| `0x0080_0000 - 0x0081_ffff`                     | 128 KiB   | .heap |
+| `0x0082_0000 - 0x02ff_efff`                     |  44 MiB   | .bss  |
 | `0x02ff_f000 - 0x02ff_ffff`                     | 4 KiB        | cmdline (so-called command line arguments)                            |
 | `0x0300_0000 - 0x09ff_ffff`                     | 112 MiB       | free vaddr                                                         |
+
 
 ## メモリ定数（リンクアドレス: 物理アドレス）
 
@@ -40,7 +42,7 @@ MEMORY {
 | __kernel_image | 0x0000_0000_0080_0000  | カーネルイメージの先頭  |
 | __kernel_page_table | LMA(ALIGN(__bss_end, 4096)) | カーネルページテーブルの先頭 |
 | __boot_stack_base | __kernel_pge_table + 0x4000  | 各CPU用のブートスタック領域の先頭  |
-| __kernel_image_end | ALIGN(_boot_stack_base + (0x1999 * 4), 4096)  | カーネルイメージの終端 |
+| __kernel_image_end | ALIGN(_boot_stack_base + (0x1000 * 16), 4096)  | カーネルイメージの終端 |
 
 ## ページテーブルの構成
 

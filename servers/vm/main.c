@@ -41,13 +41,14 @@ error_t ipc_call_pager(struct message *m) {
     return err;
 }
 
+// 自動起動に指定されているservers/appsを起動する
 static void spawn_servers(void) {
     // Launch servers in bootfs.
     int num_launched = 0;
     struct bootfs_file *file;
     for (int i = 0; (file = bootfs_open(i)) != NULL; i++) {
         // Autostart server names (separated by whitespace).
-        char *startups = AUTOSTARTS;
+        char *startups = AUTOSTARTS;    // makeに設定: AUTOSTARTS="dm hello ramdisk shell"
 
         // Execute the file if it is listed in the autostarts.
         while (*startups != '\0') {
