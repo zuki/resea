@@ -200,6 +200,7 @@ void *malloc(size_t size) {
                 // チャンクがリストの戦闘の場合
                 bins[NUM_BINS - 1] = bins[NUM_BINS - 1]->next;
             }
+            //INFO("no additional chunk");
         }
         //INFO("allocated=0x%#llx from chunk", allocated);
         if (allocated) {
@@ -213,9 +214,10 @@ void *malloc(size_t size) {
             return allocated->data;
         }
         prev = chunk;
+        //INFO("next-loop: 0x%p", chunk->next);
     }
 
-    PANIC("out of memory");
+    PANIC("out of memory: 0x%#llx", size);
 }
 
 /// ptr(chunk->data)からchunkを返す

@@ -37,8 +37,10 @@ SECTIONS {
     __zeroed_pages = .;
 
     .bss : ALIGN(0x1000) {
+        /* fatfsでout of memoryが発生したのでheap領域を拡大 */
+        /*    0x20000 (128KiB) -> 0x200000 (2MiB)           */
         __heap = .;
-        . += 0x20000;
+        . += 0x200000;
         __heap_end = .;
 
         __bss = .;

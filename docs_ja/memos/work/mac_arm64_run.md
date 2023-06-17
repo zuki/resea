@@ -3260,3 +3260,39 @@ index 532b057..09fab66 100644
      prompt("");
      while (true) {
 ```
+
+## FATFSでpanic
+
+```bash
+$ vi .config
+  CONFIG_FATFS_SERVER=y
+$ make run
+
+[ramdisk] ready
+[fatfs] Files ---------------------------------------------
+[fatfs] /HELLO   TXT
+[fatfs] ---------------------------------------------------
+[fatfs] ready
+shell> fs-read /hello.txt
+[fatfs] WARN: len-rem: 18
+[fatfs] data_len: 18
+[shell] Hello from FAT :D
+
+[fatfs] WARN: cluster end
+[fatfs] data_len: 0
+[fatfs] chunk->capacity: 0x27a0, chunk_size: 0x4000         // out of memory
+[fatfs] PANIC: out of memory: 4000
+[fatfs] WARN: Backtrace:
+[fatfs] WARN:     #0: 000000000010769c malloc()+0x85c
+[fatfs] WARN:     #1: 000000000010bbf8 pre_recv()+0x38
+[fatfs] WARN:     #2: 000000000010b294 ipc_call_pager()+0x14
+[fatfs] WARN:     #3: 000000000010b518 pre_send()+0x98
+[fatfs] WARN:     #4: 000000000010b998 ipc_send_noblock()+0x48
+[fatfs] WARN:     #5: 000000000010baf0 ipc_reply()+0x10
+[fatfs] WARN:     #6: 000000000010099c main()+0x47c
+[fatfs] WARN:     #7: 0000000000106a40 resea_init()+0x50
+[fatfs] WARN:     #8: 000000000010ebc4 halt()+0x0
+```
+
+- 単なるheap領域不足だった。
+- heap領域を拡大(128Kibから2MiB)したらエラーは消えた
